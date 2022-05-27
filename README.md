@@ -1,7 +1,7 @@
 
-# transactional-risking
+# Transactional Risking Service
 
-This is a placeholder README.md for a new repository
+This will be the service which will provide HMRC Assist, both as an API as well as for internal usage.
 
 ### License
 
