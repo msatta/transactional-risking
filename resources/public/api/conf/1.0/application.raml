@@ -46,9 +46,9 @@ uses:
           uriParameters:
             nino: !include pathParameters/nino.raml
           /{calculationId} :
-#            get: !include endpoints/selfAssessment/retrieveMetadata.raml
-#            uriParameters:
-#              calculationId: !include pathParameters/calculationId.raml
+            get: !include endpoints/generateReport/generateReport.raml
+            uriParameters:
+              calculationId: !include pathParameters/calculationId.raml
         # End of Produce a Transactional Risking Calculation Report.
         /{reportId}:
           post: !include endpoints/acknowledge/confirmReport.raml
