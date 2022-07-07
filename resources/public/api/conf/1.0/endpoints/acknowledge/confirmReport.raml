@@ -1,64 +1,19 @@
-#is:
+is:
 #  - headers.acceptJson
 #  - headers.testScenarioHeader
-#  - errors.formatNino
-#  - errors.formatCalcId
-#  - errors.clientOrAgentNotAuthorised
-#  - errors.ruleCalculationErrorMessagesExist
-#  - errors.notFoundRetrieveTaxCalc
-#  - errors.ruleIncorrectGTS
-displayName: Confirm report
-description: This endpoint allows you confirm that the report has received and read or processed in some way.
+  - errors.formatNino
+  - errors.invalidCredentials
+  - errors.clientOrAgentNotAuthorised
+  - errors.reportNotFound
+
+displayName: Acknowledge report
+description: This endpoint allows you acknowledge that the report has received and read or processed in some way.
 #(annotations.sandboxData): !include ../../scenarios/selfAssessment/retrieveIncomeTaxAndNics.md
 #(annotations.scope): "read:self-assessment"
 #securedBy: [ sec.oauth_2_0: { scopes: [ "read:self-assessment" ] } ]
 responses:
   200:
-    body:
-      application/json:
-        example: |
-          {
-            "message" : "OK::TODO"
-          }
-  204:
-    body:
-      application/json:
-        example: |
-          {
-            "message" : "No Content::TODO"
-          }
 
-  404:
-    body:
-      application/json:
-        example: |
-          {
-            "message" : "REPORT NOT FOUND::TODO"
-          }
-
-  403:
-    body:
-      application/json:
-        example: |
-          {
-            "message" : "CLIENT AGENT NOT AUTHORISEDD::TODO"
-          }
-  401:
-    body:
-      application/json:
-        example: |
-          {
-            "message" : "INVALID CREDENTIALS::TODO"
-          }
-
-  # Note other service errors will be remapped to 500 such as 500/503
-  500:
-    body:
-      application/json:
-        example: |
-          {
-            "message" : "INTERNAL SERVER ERROR"
-          }
 
 # 200:
 #   body:
@@ -67,7 +22,7 @@ responses:
 #       examples:
 #         example-1:
 #            description: Example calculation response.
-#            value: !include ../../examples\confirmReportProcessed.json
+#            value: !include ../../examples/acknowledge/confirmReportProcessed.json
 #   headers:
 #      X-CorrelationId:
 #        example: c75f40a6-a3df-4429-a697-471eeec46435
