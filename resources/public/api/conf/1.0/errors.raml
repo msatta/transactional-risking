@@ -224,6 +224,28 @@ traits:
                 description: No tax calculations can be found for the supplied NINO and tax year.
                 value:
                   code: MATCHING_RESOURCE_NOT_FOUND
+  ninoNotFound:
+    responses:
+      404:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              ninoNotFound:
+                description: Report not found.
+                value:
+                  code: NINO_NOT_FOUND
+  calcIdNotFound:
+    responses:
+      404:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              calcIdNotFound:
+                description: Report not found.
+                value:
+                  code: CALC_ID_NOT_FOUND
   reportNotFound:
     responses:
       404:
