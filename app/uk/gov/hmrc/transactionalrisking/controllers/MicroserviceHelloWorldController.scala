@@ -16,16 +16,20 @@
 
 package uk.gov.hmrc.transactionalrisking.controllers
 
-import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import javax.inject.{Inject, Singleton}
+import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import uk.gov.hmrc.transactionalrisking.connectors.GreetingConnector
+
 import scala.concurrent.Future
 
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.ExecutionContext
+
 @Singleton()
-class MicroserviceHelloWorldController @Inject()(cc: ControllerComponents)
+class MicroserviceHelloWorldController @Inject()(downstreamConnector: GreetingConnector, cc: ControllerComponents)(implicit ec: ExecutionContext)
     extends BackendController(cc) {
 
   def hello(): Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok("HMRC-Assist"))
+    downstreamConnector.getGreeting().map(g => Ok(g.message))
   }
 }
