@@ -16,7 +16,8 @@ lazy val microservice = Project(appName, file("."))
     scalacOptions += "-P:silencer:pathFilters=routes",
     libraryDependencies ++= Seq(
       compilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full),
-      "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full
+      "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full,
+      "org.scalatestplus" %% "mockito-4-5" % "3.2.12.0" % "test"
     )
     // ***************
   )
