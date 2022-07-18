@@ -1,4 +1,4 @@
-->         /transactional-risking        app.Routes
-->         /transactional-risking        definition.Routes
+->         /        app.Routes
+->         /        definition.Routes
 
 GET        /admin/metrics                com.kenshoo.play.metrics.MetricsController.metrics
