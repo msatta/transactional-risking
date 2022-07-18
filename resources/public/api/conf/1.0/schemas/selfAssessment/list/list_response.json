@@ -10,7 +10,7 @@
       "pattern": "^[0-9]{8}|[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
       "example": "f2fb30e5-4ab6-4a29-b3c1-c7264259ff1c"
     },
-    "data": {
+    "messages": {
       "description": "Array of messages.",
       "type": "array",
       "items": {
@@ -24,7 +24,7 @@
             "description": "Title of message",
             "example": "Turnover and Cost of Sales"
           },
-          "message": {
+          "body": {
             "type": "string",
             "description": "The message",
             "example": "Your cost of sales (12000) is greater than your actual income (4000). This may be an error."
@@ -34,27 +34,33 @@
             "description": "The action required",
             "example": "Please read our guidance and consider amending Box 10 of your submission."
           },
-          "LinkTitle": {
-            "type": "string",
-            "description": "Title of Link that provides useful info",
-            "example": "Our guidance on Turnover and Expenses can be read here."
-          },
-          "linksurl": {
-            "type": "string",
-            "description": "Actual Link to useful info",
-            "example": "https://www.gov.uk/expenses-if-youre-self-employed"
-          },
-          "typeId": {
-            "type": "string",
-            "description": "Type ID",
-            "example": "001"
+          "links" : {
+            "description": "Array of links",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "collection of Elements of the message.",
+              "example": "[ { \",Turnover and Cost of Sales\", \"Your cost of sales (12000) is greater than your actual income (4000). This may be an error.\" }, .. etc]]",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "description": "Title of Link that provides useful info",
+                  "example": "Our guidance on Turnover and Expenses can be read here."
+                },
+                "url": {
+                  "type": "string",
+                  "description": "Actual Link to useful info",
+                  "example": "https://www.gov.uk/expenses-if-youre-self-employed"
+                }
+              }
+            }
           }
         },
         "required": [
           "title",
-          "message"
+          "body",
+          "links"
         ]
-
       }
     }
   },

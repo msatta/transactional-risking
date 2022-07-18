@@ -293,3 +293,15 @@ traits:
 #                value:
 #                  code: MATCHING_RESOURCE_NOT_FOUND
 # DELETE AFTERCHECK END
+
+  internalServerError:
+    responses:
+      500:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              internalServerError:
+                description: 'A server or service that is required is not available.'
+                value:
+                  code: INTERNAL_SERVER_ERROR
