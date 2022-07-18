@@ -25,7 +25,7 @@ import javax.inject.Inject
 class DocumentationController @Inject()(assets: Assets, cc: ControllerComponents) extends BackendController(cc) {
 
   def definition(): Action[AnyContent] = {
-    assets.at("/public/api", "definition.json")
+    assets.at("/public/api/conf", "definition.json")
   }
 
 
