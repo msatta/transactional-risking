@@ -6,7 +6,7 @@
       "body": "Your cost of sales (12000) is greater than your actual income (4000). This may be an error.",
       "action": "Please read our guidance and consider amending Box 10 of your submission.",
 
-     links : [
+     "links" : [
         {
           "title": "Our guidance on Turnover and Expenses can be read here.",
           "url": "https://www.gov.uk/expenses-if-youre-self-employed"

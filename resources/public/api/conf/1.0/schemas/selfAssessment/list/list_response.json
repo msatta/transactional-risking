@@ -58,9 +58,9 @@
         },
         "required": [
           "title",
-          "message"
+          "body",
+          "links"
         ]
-
       }
     }
   },
