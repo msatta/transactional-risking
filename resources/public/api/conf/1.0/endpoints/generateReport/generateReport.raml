@@ -9,8 +9,8 @@ is:
   - errors.invalidCredentials
   - errors.clientOrAgentNotAuthorised
 
-displayName: Produce a Transactional Risking Calculation Report
-description: This endpoint allows the developer to generate and return a report for the previous tax calculation and taxpayer.
+displayName: Transactional Risking Feedback Report
+description: This endpoint allows the developer to generate and return a feedback for the given calculationId and nino.
 #(annotations.sandboxData): !include ../../scenarios/selfAssessment/retrieveIncomeTaxAndNics.md
 (annotations.scope): "read:hmrc-self-assessment-assist"
 securedBy: [ sec.oauth_2_0: { scopes: [ "read:hmrc-self-assessment-assist" ] } ]
