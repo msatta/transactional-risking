@@ -2,7 +2,7 @@
   "scopes": [
   ],
   "api": {
-    "name": "Hello World",
+    "name": "Hello world",
     "description": "A 'hello world' example of an API on the HMRC API Developer Hub.",
     "context": "hello",
     "categories": ["Example"],
