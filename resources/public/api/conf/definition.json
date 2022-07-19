@@ -2,9 +2,10 @@
   "scopes": [
   ],
   "api": {
-    "name": "Hello World",
+    "name": "Transactional Risking",
     "description": "A 'hello world' example of an API on the HMRC API Developer Hub.",
     "context": "hello",
+    "categories": ["Example"],
     "versions": [
       {
         "version": "1.0",

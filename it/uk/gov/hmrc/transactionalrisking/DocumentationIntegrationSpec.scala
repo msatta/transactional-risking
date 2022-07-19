@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.transactionalrisking
 
-
 import org.scalatest.Inspectors.forAll
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.should.Matchers
