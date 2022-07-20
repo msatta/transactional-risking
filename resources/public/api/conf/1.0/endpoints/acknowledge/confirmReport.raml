@@ -9,8 +9,8 @@ is:
 displayName: Acknowledge report
 description: This endpoint allows you acknowledge that the report has received and read or processed in some way.
 #(annotations.sandboxData): !include ../../scenarios/selfAssessment/retrieveIncomeTaxAndNics.md
-(annotations.scope): "write:hmrc-self-assessment-assist"
-securedBy: [ sec.oauth_2_0: { scopes: [ "write:hmrc-self-assessment-assist" ] } ]
+(annotations.scope): "write:self-assessment-assist"
+securedBy: [ sec.oauth_2_0: { scopes: [ "write:self-assessment-assist" ] } ]
 responses:
   204:
   500:
