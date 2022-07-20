@@ -1,14 +1,14 @@
 {
-  "scopes": [
+  "scopes": [ "read:self-assessment-assist", "write:self-assessment-assist"
   ],
   "api": {
-    "name": "Hello world",
-    "description": "A 'hello world' example of an API on the HMRC API Developer Hub.",
-    "context": "hello",
+    "name": "HMRC-Assist",
+    "description": "Allows you to read your self assessment report and acknowledge it.",
+    "context": "organisations/transactional-risking",
     "versions": [
       {
         "version": "1.0",
-        "status": "STABLE",
+        "status": "ALPHA",
         "endpointsEnabled": true
       }
     ]

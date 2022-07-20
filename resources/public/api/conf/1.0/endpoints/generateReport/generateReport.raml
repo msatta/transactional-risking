@@ -12,8 +12,8 @@ is:
 displayName: Transactional Risking Feedback Report
 description: This endpoint allows the developer to generate and return a feedback for the given calculationId and nino.
 #(annotations.sandboxData): !include ../../scenarios/selfAssessment/retrieveIncomeTaxAndNics.md
-(annotations.scope): "read:hmrc-self-assessment-assist"
-securedBy: [ sec.oauth_2_0: { scopes: [ "read:hmrc-self-assessment-assist" ] } ]
+(annotations.scope): "read:self-assessment-assist"
+securedBy: [ sec.oauth_2_0: { scopes: [ "read:self-assessment-assist" ] } ]
 responses:
   200:
     body:
