@@ -1,6 +1,6 @@
 #%RAML 1.0
 ---
-title: Transactional Risking (MTD)
+title: Self Assessment Assist (MTD)
 description: Allows a customer report to be triggered by a customer or agency. The resulting self assessment report will contain a list containing errors, and warnings. The report is safely recorded before being sent to the client. The report if required may have a confirmation recorded against it.
 version: 1.0
 
@@ -39,7 +39,7 @@ uses:
 /individuals:
   /self-assessment:
     (annotations.group):
-      name: Transactional Risking Service
+      name: Self Assessment Assist
       description: !include docs/group_selfAssessment_RDS.md
     /assist:
       /reports:
@@ -50,11 +50,10 @@ uses:
             get: !include endpoints/generateReport/generateReport.raml
             uriParameters:
               calculationId: !include pathParameters/calculationId.raml
-        # End of Produce a Transactional Risking Calculation Report.
-        /{reportId}:
-          post: !include endpoints/acknowledge/confirmReport.raml
-          uriParameters:
-            reportId: !include pathParameters/reportId.raml
-
-        #End of Acknowledge a Transaction Risking Calculation Report.
+        # End of Produce a Self Assessment Assist Report.
+          /{reportId}:
+            post: !include endpoints/acknowledge/confirmReport.raml
+            uriParameters:
+              reportId: !include pathParameters/reportId.raml
+        #End of Acknowledge a Self Assessment Report.
 
