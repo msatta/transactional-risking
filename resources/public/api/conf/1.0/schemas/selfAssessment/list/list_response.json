@@ -58,14 +58,12 @@
         },
         "required": [
           "title",
-          "body",
-          "links"
+          "body"
         ]
       }
     }
   },
   "required": [
-    "reportId",
-    "messages"
+    "reportId"
   ]
 }
