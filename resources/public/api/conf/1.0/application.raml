@@ -51,9 +51,13 @@ uses:
             uriParameters:
               calculationId: !include pathParameters/calculationId.raml
         # End of Produce a Self Assessment Assist Report.
-          /{reportId}:
-            post: !include endpoints/acknowledge/confirmReport.raml
+        /acknowledge:
+          /{nino}:
             uriParameters:
-              reportId: !include pathParameters/reportId.raml
-        #End of Acknowledge a Self Assessment Report.
+              nino: !include pathParameters/nino.raml
+            /{reportId}:
+              post: !include endpoints/acknowledge/confirmReport.raml
+              uriParameters:
+                reportId: !include pathParameters/reportId.raml
+        #End of Acknowledge a Self Assessment Assist Report.
 
