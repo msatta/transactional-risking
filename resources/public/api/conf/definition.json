@@ -11,9 +11,10 @@
     }
   ],
   "api": {
-    "name": "HMRC-Assist",
+    "name": "Self Assessment Assist",
     "description": "Allows you to read your self assessment report and acknowledge it.",
     "context": "organisations/transactional-risking",
+    "categories": ["INCOME_TAX_MTD"],
     "versions": [
       {
         "version": "1.0",
