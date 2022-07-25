@@ -1,1 +1,1 @@
-You can find the changelog in the [transactional-risking-changelog](https://github.com/hmrc/transactional-risking/wiki) GitHub wiki.
+You can find the changelog in the [self-assessement-assist-changelog](https://github.com/hmrc/transactional-risking/wiki) GitHub wiki.
