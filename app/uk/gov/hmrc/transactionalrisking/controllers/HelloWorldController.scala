@@ -16,21 +16,18 @@
 
 package uk.gov.hmrc.transactionalrisking.controllers
 
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
-import play.api.http.Status
-import play.api.test.Helpers._
-import play.api.test.{FakeRequest, Helpers}
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import uk.gov.hmrc.transactionalrisking.connectors.GreetingConnector
 
-class MicroserviceHelloWorldControllerSpec extends AnyWordSpec with Matchers {
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.ExecutionContext
 
-  private val fakeRequest = FakeRequest("GET", "/")
-  private val controller = new MicroserviceHelloWorldController(Helpers.stubControllerComponents())
+@Singleton()
+class HelloWorldController @Inject()(connector: GreetingConnector, cc: ControllerComponents)(implicit ec: ExecutionContext)
+    extends BackendController(cc) {
 
-  "GET /" should {
-    "return 200" in {
-      val result = controller.hello()(fakeRequest)
-      status(result) shouldBe Status.OK
-    }
+  def hello(): Action[AnyContent] = Action.async { implicit request =>
+    connector.getGreeting().map(g => Ok(g.message))
   }
 }
