@@ -34,7 +34,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class GreetingConnector @Inject()(http: HttpClient, services: ServicesConfig)(implicit ec: ExecutionContext) {
 
   // Get the (protocol, hostname, port) of the downstream service to be consume (e.g. any of the "stubs")
-  val baseUrl = s"""${services.baseUrl("stubs")}/transactional-risking-stubs"""
+  val baseUrl = s"""${services.baseUrl("stubs")}"""
 
   /**
    * This is an example showing how to get some resource from a downstream service
