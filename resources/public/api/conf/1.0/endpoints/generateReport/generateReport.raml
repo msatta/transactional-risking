@@ -9,8 +9,8 @@ is:
   - errors.invalidCredentials
   - errors.clientOrAgentNotAuthorised
 
-displayName: Self Assessment Assist Feedback Report
-description: This endpoint allows the developer to generate and return a feedback for the given calculationId and nino.
+displayName: Produce a Self Assessment Assist Report
+description: This endpoint allows a developer to generate and return a self-assessment assist report for a tax calculation and taxpayer.
 #(annotations.sandboxData): !include ../../scenarios/selfAssessment/retrieveIncomeTaxAndNics.md
 (annotations.scope): "read:self-assessment-assist"
 securedBy: [ sec.oauth_2_0: { scopes: [ "read:self-assessment-assist" ] } ]
