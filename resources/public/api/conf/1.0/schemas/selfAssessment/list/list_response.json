@@ -5,17 +5,17 @@
   "type": "object",
   "properties": {
     "reportId": {
-      "description": "The unique identifier of the calculation.",
+      "description": "The unique ID (UUID) of the report.",
       "type": "string",
       "pattern": "^[0-9]{8}|[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
       "example": "f2fb30e5-4ab6-4a29-b3c1-c7264259ff1c"
     },
     "messages": {
-      "description": "Array of messages.",
+      "description": "A list of HMRC Assist 'messages' for the customer.",
       "type": "array",
       "items": {
         "type": "object",
-        "description": "collection of Elements of the message.",
+        "description": "The body contains the message for the customer.",
         "example":
             "[ { \",Turnover and Cost of Sales\", \"Your cost of sales (12000) is greater than your actual income (4000). This may be an error.\" }, .. etc]]",
         "properties": {
@@ -26,30 +26,30 @@
           },
           "body": {
             "type": "string",
-            "description": "The message",
+            "description": "The body contains the message for the customer.",
             "example": "Your cost of sales (12000) is greater than your actual income (4000). This may be an error."
           },
           "action": {
             "type": "string",
-            "description": "The action required",
+            "description": "The recommend action the customer should take.",
             "example": "Please read our guidance and consider amending Box 10 of your submission."
           },
           "links" : {
-            "description": "Array of links",
+            "description": "A list of help or support 'links' associated with the message body.",
             "type": "array",
             "items": {
               "type": "object",
-              "description": "collection of Elements of the message.",
+              "description": "A list of help or support 'links' associated with the message body.",
               "example": "[ { \",Turnover and Cost of Sales\", \"Your cost of sales (12000) is greater than your actual income (4000). This may be an error.\" }, .. etc]]",
               "properties": {
                 "title": {
                   "type": "string",
-                  "description": "Title of Link that provides useful info",
+                  "description": "The title text that appears before the links..",
                   "example": "Our guidance on Turnover and Expenses can be read here."
                 },
                 "url": {
                   "type": "string",
-                  "description": "Actual Link to useful info",
+                  "description": "The URL of support or help link.",
                   "example": "https://www.gov.uk/expenses-if-youre-self-employed"
                 }
               }
