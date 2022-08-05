@@ -16,8 +16,6 @@ documentation:
    content: !include https://developer.service.hmrc.gov.uk/api-documentation/assets/common/docs/versioning.md
  - title: Errors
    content: !include https://developer.service.hmrc.gov.uk/api-documentation/assets/common/docs/errors.md
- - title: Errors
-   content: !include docs/errors.md
  - title: Changelog
    content: !include docs/changelog.md
  - title: Support
@@ -47,7 +45,7 @@ uses:
           uriParameters:
             nino: !include pathParameters/nino.raml
           /{calculationId} :
-            get: !include endpoints/generateReport/generateReport.raml
+            post: !include endpoints/generateReport/generateReport.raml
             uriParameters:
               calculationId: !include pathParameters/calculationId.raml
         # End of Produce a Self Assessment Assist Report.
