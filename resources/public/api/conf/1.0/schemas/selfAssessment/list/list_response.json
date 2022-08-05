@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "List of Self Assessment Calculations",
-  "description": "List of Self Assessment Calculations",
+  "description": "This endpoint allows a developer to generate and return a HMRC Assist report for a tax calculation and taxpayer",
   "type": "object",
   "properties": {
     "reportId": {
