@@ -18,9 +18,29 @@ package uk.gov.hmrc.transactionalrisking.config
 
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import uk.gov.hmrc.transactionalrisking.utils.Retrying
+
+import scala.concurrent.duration.{Duration, FiniteDuration}
 
 @Singleton
-class AppConfig @Inject()(config: Configuration) {
+class AppConfig @Inject()(config: ServicesConfig,configuration: Configuration) {
 
-  val appName: String = config.get[String]("appName")
+  val appName: String = config.getString("appName")
+
+  // NRS config items
+  val nrsApiKey: String = config.getString("access-keys.xApiKey")
+  private val nrsConfig = configuration.get[Configuration]("microservice.services.non-repudiation")
+  val nrsBaseUrl: String = config.baseUrl("non-repudiation")
+  lazy val nrsRetries: List[FiniteDuration] =
+    Retrying.fibonacciDelays(getFiniteDuration(nrsConfig, "initialDelay"), nrsConfig.get[Int]("numberOfRetries"))
+
+  private final def getFiniteDuration(config: Configuration, path: String): FiniteDuration = {
+    val string = config.get[String](path)
+
+    Duration.create(string) match {
+      case f: FiniteDuration => f
+      case _                 => throw new RuntimeException(s"Not a finite duration '$string' for $path")
+    }
+  }
 }
