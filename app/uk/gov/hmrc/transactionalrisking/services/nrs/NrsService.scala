@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.nrs
+package uk.gov.hmrc.transactionalrisking.services.nrs
 
 import com.kenshoo.play.metrics.Metrics
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import uk.gov.hmrc.transactionalrisking.controllers.UserRequest
-import uk.gov.hmrc.transactionalrisking.nrs.models.request.{Metadata, NrsSubmission, SearchKeys}
-import uk.gov.hmrc.transactionalrisking.nrs.models.response.NrsResponse
+import uk.gov.hmrc.transactionalrisking.services.nrs.models.request.{Metadata, NotableEventType, NrsSubmission, SearchKeys, SubmitRequest}
+import uk.gov.hmrc.transactionalrisking.services.nrs.models.response.NrsResponse
+import uk.gov.hmrc.transactionalrisking.services.nrs.models.request.{NotableEventType, NrsSubmission, SubmitRequest}
+import uk.gov.hmrc.transactionalrisking.services.nrs.models.response.NrsResponse
 import uk.gov.hmrc.transactionalrisking.utils.{DateUtils, HashUtil, Logging}
 
-import java.time.OffsetDateTime
+import java.time.{LocalDate, OffsetDateTime}
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -36,36 +38,36 @@ class NrsService @Inject()(
                            hashUtil: HashUtil) extends Logging {
 //                           override val metrics: Metrics) extends Timer with Logging { TODO include metrics later
 
-  def submit(vatSubmission: SubmitRequest, generatedNrsId: String, submissionTimestamp: OffsetDateTime)(
+  def submit(vatSubmission: SubmitRequest, generatedNrsId: String, submissionTimestamp: OffsetDateTime,notableEventType: NotableEventType)(
     implicit request: UserRequest[_],
     hc: HeaderCarrier,
     ec: ExecutionContext,
     correlationId: String): Future[Option[NrsResponse]] = {
 
-    val nrsSubmission = buildNrsSubmission(vatSubmission, submissionTimestamp, request)
+    val nrsSubmission = buildNrsSubmission(vatSubmission, submissionTimestamp, request,notableEventType)
 
-    def audit(resp: NrsOutcome): Future[AuditResult] = resp match {
-      case Left(err) => logger.info(s"left message")
+//    def audit(resp: NrsOutcome): Future[AuditResult] = resp match {
+//      case Left(err) => logger.info(s"left message")
 //        auditService.auditEvent(
 //          AuditEvents.auditNrsSubmit("submitToNonRepudiationStoreFailure",
 //            NrsAuditDetail(
-//              vatSubmission.vrn.toString,
+//              trReportSubmission.vrn.toString,
 //              request.headers.get("Authorization").getOrElse(""),
 //              Some(generatedNrsId),
 //              Some(Json.toJson(nrsSubmission)),
 //              correlationId))
 //        )
-      case Right(resp) => logger.info(s"Right resp ")
+//      case Right(resp) => logger.info(s"Right resp ")
 //        auditService.auditEvent(
 //          AuditEvents.auditNrsSubmit("submitToNonRepudiationStore",
 //            NrsAuditDetail(
-//              vatSubmission.vrn.toString,
+//              trReportSubmission.vrn.toString,
 //              request.headers.get("Authorization").getOrElse(""),
 //              Some(resp.nrSubmissionId),
 //              None,
 //              correlationId))
 //        )
-    }
+//    }
 
 //    timeFuture("NRS Submission", "nrs.submission") {
 //      connector.submit(nrsSubmission).map { response =>
@@ -73,22 +75,31 @@ class NrsService @Inject()(
 //        response.toOption
 //      }
 //    }
+
+          connector.submit(nrsSubmission).map { response =>
+            response.toOption
+          }
+
   }
 
-  def buildNrsSubmission(vatSubmission: SubmitRequest,
+  def buildNrsSubmission(trReportSubmission: SubmitRequest,
                          submissionTimestamp: OffsetDateTime,
-                         request: UserRequest[_]): NrsSubmission = {
+                         request: UserRequest[_],notableEventType:NotableEventType): NrsSubmission = {
 
-    val payloadString = Json.toJson(body).toString()
+    //TODO fix me later, body will be instance of class NewRdsAssessmentReport
+   // val payloadString = Json.toJson(body).toString()
+    val payloadString = Json.toJson(trReportSubmission.body).toString()
     val encodedPayload = hashUtil.encode(payloadString)
     val sha256Checksum = hashUtil.getHash(payloadString)
     val formattedDate = submissionTimestamp.format(DateUtils.isoInstantDatePattern)
 
+    //TODO refer https://confluence.tools.tax.service.gov.uk/display/NR/Transactional+Risking+Service+-+API+-+NRS+Assessment
+
     NrsSubmission(
       payload = encodedPayload,
       Metadata(
-        businessId = "vat",
-        notableEvent = "vat-return",
+        businessId = "self-assessment-assist",
+        notableEvent = notableEventType.value,//assist-report-generated,assist-report-acknowledged
         payloadContentType = "application/json",
         payloadSha256Checksum = sha256Checksum,
         userSubmissionTimestamp = formattedDate,
@@ -97,10 +108,11 @@ class NrsService @Inject()(
         headerData = Json.toJson(request.headers.toMap.map { h => h._1 -> h._2.head }),
         searchKeys =
           SearchKeys(
-            vrn = Some(vrn.vrn),
-            companyName = None,
-            periodKey = body.periodKey,
-            taxPeriodEndDate = None
+//            vrn = Some(trReportSubmission.vrn.vrn),
+//            companyName = None,
+            nino = "NINO",
+            taxPeriodEndDate = LocalDate.now(), //TODO fix me taxPeriodEndDate
+            reportId = trReportSubmission.body.reportId,
           )
       )
     )

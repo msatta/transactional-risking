@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.nrs.models.request
+package uk.gov.hmrc.transactionalrisking.services.nrs.models.request
 
 import play.api.libs.json._
 import uk.gov.hmrc.transactionalrisking.utils.DateUtils

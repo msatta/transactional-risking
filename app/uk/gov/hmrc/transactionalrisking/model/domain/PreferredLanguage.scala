@@ -14,11 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.model.auth
+package uk.gov.hmrc.transactionalrisking.model.domain
 
-import uk.gov.hmrc.transactionalrisking.services.nrs.models.request.IdentityData
+import play.api.libs.json.{Format, Json}
+import uk.gov.hmrc.transactionalrisking.model.domain
 
-case class UserDetails(userType: String,
-                       agentReferenceNumber: Option[String],
-                       clientId: String,
-                       identityData: Option[IdentityData] = None)
+object PreferredLanguage extends Enumeration {
+
+  type PreferredLanguage = Value
+
+  val English: domain.PreferredLanguage.Value = Value("EN")
+  val Welsh: domain.PreferredLanguage.Value = Value("CY")
+
+  implicit val format: Format[PreferredLanguage] = Json.formatEnum(PreferredLanguage)
+
+}
+

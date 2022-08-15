@@ -24,6 +24,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.transactionalrisking.model.{DownstreamError, ForbiddenDownstreamError, LegacyUnauthorisedError, VrnFormatError}
 import uk.gov.hmrc.transactionalrisking.model.auth.UserDetails
+import uk.gov.hmrc.transactionalrisking.model.domain.Nino
 import uk.gov.hmrc.transactionalrisking.services.EnrolmentsAuthService
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -34,16 +35,17 @@ abstract class AuthorisedController(cc: ControllerComponents)(implicit ec: Execu
 
   val authService: EnrolmentsAuthService
 
-  def authorisedAction(vrn: String, nrsRequired: Boolean = false): ActionBuilder[UserRequest, AnyContent] = new ActionBuilder[UserRequest, AnyContent] {
+//  def authorisedAction(vrn: String, nrsRequired: Boolean = false): ActionBuilder[UserRequest, AnyContent] = new ActionBuilder[UserRequest, AnyContent] {
+  def authorisedAction(nino: String, nrsRequired: Boolean = false): ActionBuilder[UserRequest, AnyContent] = new ActionBuilder[UserRequest, AnyContent] {
 
     override def parser: BodyParser[AnyContent] = cc.parsers.defaultBodyParser
 
     override protected def executionContext: ExecutionContext = cc.executionContext
 
     //TODO fix predicate
-    def predicate(vrn: String): Predicate =
+    def predicate(nino: String): Predicate =
       Enrolment("HMRC-MTD-VAT")
-        .withIdentifier("VRN", vrn)
+        .withIdentifier("NINO", nino)
         .withDelegatedAuthRule("mtd-vat-auth")
 
     override def invokeBlock[A](request: Request[A], block: UserRequest[A] => Future[Result]): Future[Result] = {
@@ -52,8 +54,10 @@ abstract class AuthorisedController(cc: ControllerComponents)(implicit ec: Execu
 
       val clientId = request.headers.get("X-Client-Id").getOrElse("N/A")
 
-      if (VrnValidation.validate(vrn) == Nil) {
-        authService.authorised(predicate(vrn), nrsRequired).flatMap[Result] {
+      //TODO check if we need to perform NINO validation here Nino.isValid(nino)
+//      if (VrnValidation.validate(vrn) == Nil) {
+      if (Nino.isValid(nino)) {
+        authService.authorised(predicate(nino), nrsRequired).flatMap[Result] {
           case Right(userDetails) => block(UserRequest(userDetails.copy(clientId = clientId), request))
           case Left(LegacyUnauthorisedError) => Future.successful(Forbidden(Json.toJson(LegacyUnauthorisedError)))
           case Left(ForbiddenDownstreamError) => Future.successful(Forbidden(Json.toJson(DownstreamError)))

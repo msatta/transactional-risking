@@ -25,7 +25,7 @@ import uk.gov.hmrc.auth.core.retrieve.{ItmpAddress, ItmpName, ~}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.transactionalrisking.model.auth.{AuthOutcome, UserDetails}
 import uk.gov.hmrc.transactionalrisking.model.{DownstreamError, ForbiddenDownstreamError, LegacyUnauthorisedError, TRError}
-import uk.gov.hmrc.transactionalrisking.nrs.models.request.IdentityData
+import uk.gov.hmrc.transactionalrisking.services.nrs.models.request.IdentityData
 import uk.gov.hmrc.transactionalrisking.utils.Logging
 
 import javax.inject.{Inject, Singleton}

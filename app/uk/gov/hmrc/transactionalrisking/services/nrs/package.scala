@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.model.auth
+package uk.gov.hmrc.transactionalrisking.services
 
-import uk.gov.hmrc.transactionalrisking.services.nrs.models.request.IdentityData
+import uk.gov.hmrc.transactionalrisking.model.TRError
+import uk.gov.hmrc.transactionalrisking.services.nrs.models.response.{NrsFailure, NrsResponse}
 
-case class UserDetails(userType: String,
-                       agentReferenceNumber: Option[String],
-                       clientId: String,
-                       identityData: Option[IdentityData] = None)
+import javax.xml.ws.ResponseWrapper
+
+package object nrs {
+  //TODO fix me
+//  type NrsServiceOutcome[Resp] = Either[ErrorWrapper, ResponseWrapper[Resp]]
+  type NrsOutcome = Either[NrsFailure, NrsResponse]
+}

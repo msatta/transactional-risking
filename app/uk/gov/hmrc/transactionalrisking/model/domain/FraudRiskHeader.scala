@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.nrs.models.response
+package uk.gov.hmrc.transactionalrisking.model.domain
 
-import play.api.http.Status
+import play.api.libs.functional.syntax.{toFunctionalBuilderOps, unlift}
+import play.api.libs.json.{JsPath, Reads, Writes}
 
-sealed trait NrsFailure {
-  def retryable: Boolean
-}
+case class FraudRiskHeader(key: String, value: String)
 
-case object NrsFailure {
-  case class ErrorResponse(status: Int) extends NrsFailure {
-    override def retryable: Boolean = Status.isServerError(status)
-  }
-  case object ExceptionThrown extends NrsFailure {
-    override def retryable: Boolean = false
-  }
+object FraudRiskHeader {
+
+  implicit val reads: Reads[FraudRiskHeader] =
+    (JsPath \ "key").read[String]
+      .and((JsPath \ "value").read[String])(FraudRiskHeader.apply _)
+
+  implicit val writes: Writes[FraudRiskHeader] =
+    (JsPath \ "key").write[String]
+      .and((JsPath \ "value").write[String])(unlift(FraudRiskHeader.unapply))
+
 }

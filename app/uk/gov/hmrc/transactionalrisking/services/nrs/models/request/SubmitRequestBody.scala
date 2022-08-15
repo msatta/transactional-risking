@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.nrs.models.request
+package uk.gov.hmrc.transactionalrisking.services.nrs.models.request
 
-import play.api.libs.json._
+import play.api.libs.json.Json
 
-case class NrsSubmission(payload: String, metadata: Metadata)
+//TODO newRdsAssessmentReport will be populated using NewRdsAssessmentReport class, as of now String
 
-object NrsSubmission {
-  implicit val mdFormat: OFormat[Metadata] = Metadata.format
-  implicit val format: OFormat[NrsSubmission] = Json.format[NrsSubmission]
+case class SubmitRequestBody(newRdsAssessmentReport:String,reportId:String)
+object SubmitRequestBody{
+  implicit val formatter = Json.format[SubmitRequestBody]
 }

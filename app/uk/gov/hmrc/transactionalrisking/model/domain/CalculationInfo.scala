@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.model.auth
+package uk.gov.hmrc.transactionalrisking.model.domain
 
-import uk.gov.hmrc.transactionalrisking.services.nrs.models.request.IdentityData
+import java.util.UUID
 
-case class UserDetails(userType: String,
-                       agentReferenceNumber: Option[String],
-                       clientId: String,
-                       identityData: Option[IdentityData] = None)
+case class CalculationInfo(id: UUID, nino: String, taxYear: String)

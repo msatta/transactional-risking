@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.nrs.models.request
+package uk.gov.hmrc.transactionalrisking.services.nrs.models.request
 
 import play.api.libs.json.{Json, OFormat, Reads, Writes}
 import uk.gov.hmrc.auth.core.retrieve._

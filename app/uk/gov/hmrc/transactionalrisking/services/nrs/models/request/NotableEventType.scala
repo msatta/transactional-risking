@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking
+package uk.gov.hmrc.transactionalrisking.services.nrs.models.request
 
-import uk.gov.hmrc.transactionalrisking.model.TRError
-import uk.gov.hmrc.transactionalrisking.nrs.models.response.{NrsFailure, NrsResponse}
+sealed trait NotableEventType{
+  def value:String
+}
+object AssistReportGenerated extends NotableEventType{
+  val value ="assist-report-generated"
+}
 
-import javax.xml.ws.ResponseWrapper
-
-package object nrs {
-  //TODO fix me
-//  type NrsServiceOutcome[Resp] = Either[ErrorWrapper, ResponseWrapper[Resp]]
-  type NrsOutcome = Either[NrsFailure, NrsResponse]
+object AssistReportAcknowledged extends NotableEventType{
+  val value = "assist-report-acknowledged"
 }

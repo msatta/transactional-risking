@@ -14,16 +14,8 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.nrs.models.response
+package uk.gov.hmrc.transactionalrisking.services.nrs.models.request
 
-import play.api.libs.json.{JsPath, Reads}
-
-case class NrsResponse(nrSubmissionId: String, cadesTSignature: String = deprecatedString, timestamp: String = "")
-
-object NrsResponse {
-
-  val deprecatedString: String = "This has been deprecated - DO NOT USE"
-  val empty: NrsResponse = NrsResponse("", deprecatedString, "")
-
-  implicit val reads: Reads[NrsResponse] = (JsPath \ "nrSubmissionId" ).read[String].map(NrsResponse(_, deprecatedString, ""))
-}
+import uk.gov.hmrc.transactionalrisking.model.domain.Vrn
+//TODO what is VRN?? is this required?
+case class SubmitRequest(vrn: Vrn, body: SubmitRequestBody)

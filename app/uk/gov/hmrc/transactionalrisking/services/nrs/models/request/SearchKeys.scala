@@ -14,17 +14,21 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.nrs.models.request
+package uk.gov.hmrc.transactionalrisking.services.nrs.models.request
 
 import play.api.libs.json.{Json, OFormat, Reads, Writes}
 import uk.gov.hmrc.transactionalrisking.utils.DateUtils
 
 import java.time.LocalDate
 
-case class SearchKeys(vrn: Option[String] = None,
-                      companyName: Option[String] = None,
-                      taxPeriodEndDate: Option[LocalDate] = None,
-                      periodKey: Option[String] = None
+//case class SearchKeys(vrn: Option[String] = None,
+//                      companyName: Option[String] = None,
+//                      taxPeriodEndDate: Option[LocalDate] = None,
+//                      periodKey: Option[String] = None
+//                     )
+case class SearchKeys(nino: String,
+                      taxPeriodEndDate: LocalDate,//TODO is taxPeriodEndDate optional??
+                      reportId: String
                      )
 
 object SearchKeys {

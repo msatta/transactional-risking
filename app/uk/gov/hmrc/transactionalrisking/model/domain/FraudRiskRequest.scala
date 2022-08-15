@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.model.auth
+package uk.gov.hmrc.transactionalrisking.model.domain
 
-import uk.gov.hmrc.transactionalrisking.services.nrs.models.request.IdentityData
+import uk.gov.hmrc.transactionalrisking.model.domain.FraudRiskRequest.FraudRiskHeaders
 
-case class UserDetails(userType: String,
-                       agentReferenceNumber: Option[String],
-                       clientId: String,
-                       identityData: Option[IdentityData] = None)
+// This is still being determined; please see TRDT-85.//TODO revisit me later
+class FraudRiskRequest(nino: String, taxYear: String, fraudRiskHeaders: FraudRiskHeaders)
+
+object FraudRiskRequest {
+  type FraudRiskHeaders = Map[String, String]
+}

@@ -14,11 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.model.auth
+package uk.gov.hmrc.transactionalrisking.model.domain
 
-import uk.gov.hmrc.transactionalrisking.services.nrs.models.request.IdentityData
+import play.api.libs.json.{Format, Json}
+//TODO revisit me later
+object FraudDecision extends Enumeration {
 
-case class UserDetails(userType: String,
-                       agentReferenceNumber: Option[String],
-                       clientId: String,
-                       identityData: Option[IdentityData] = None)
+  type FraudRiskDecision = Value
+
+  val Accept: FraudDecision.Value = Value("A")
+  val Check: FraudDecision.Value = Value("C")
+  val Reject: FraudDecision.Value = Value("R")
+
+  implicit val format: Format[FraudRiskDecision] = Json.formatEnum(FraudDecision)
+
+}
+

@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.nrs
+package uk.gov.hmrc.transactionalrisking.services.nrs
 
 import akka.actor.Scheduler
 import play.api.http.Status
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 import uk.gov.hmrc.transactionalrisking.config.AppConfig
-import uk.gov.hmrc.transactionalrisking.nrs.models.request.NrsSubmission
-import uk.gov.hmrc.transactionalrisking.nrs.models.response.{NrsFailure, NrsResponse}
+import uk.gov.hmrc.transactionalrisking.services.nrs.models.response.NrsResponse
+import uk.gov.hmrc.transactionalrisking.services.nrs.models.request.NrsSubmission
+import uk.gov.hmrc.transactionalrisking.services.nrs.models.response.{NrsFailure, NrsResponse}
 import uk.gov.hmrc.transactionalrisking.utils.{Delayer, Logging, Retrying}
 
 import javax.inject.{Inject, Singleton}

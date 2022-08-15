@@ -15,7 +15,7 @@
  */
 
 package uk.gov.hmrc.transactionalrisking.model.domain
-
+//TODO Do we need this class, there is another Nino class with one of the dependency
 case class Nino(nino: String) {
   require(Nino.isValid(nino), s"$nino is not a valid nino.")
 

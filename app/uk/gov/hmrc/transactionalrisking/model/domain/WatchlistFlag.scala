@@ -14,11 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.model.auth
+package uk.gov.hmrc.transactionalriskingsimulator.domain
 
-import uk.gov.hmrc.transactionalrisking.services.nrs.models.request.IdentityData
+import play.api.libs.json.{JsPath, Reads, Writes}
 
-case class UserDetails(userType: String,
-                       agentReferenceNumber: Option[String],
-                       clientId: String,
-                       identityData: Option[IdentityData] = None)
+case class WatchlistFlag(name: String)
+
+object WatchlistFlag {
+
+  implicit val reads: Reads[WatchlistFlag] =
+    (JsPath \ "name").read[String].map(WatchlistFlag.apply)
+
+  implicit val writes: Writes[WatchlistFlag] =
+    (JsPath \ "name").write[String].contramap(_.name)
+
+}

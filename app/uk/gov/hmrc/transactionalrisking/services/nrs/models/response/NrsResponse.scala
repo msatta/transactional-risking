@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.model.auth
+package uk.gov.hmrc.transactionalrisking.services.nrs.models.response
 
-import uk.gov.hmrc.transactionalrisking.services.nrs.models.request.IdentityData
+import play.api.libs.json.{JsPath, Json, Reads}
 
-case class UserDetails(userType: String,
-                       agentReferenceNumber: Option[String],
-                       clientId: String,
-                       identityData: Option[IdentityData] = None)
+case class NrsResponse(nrSubmissionId: String)
+
+object NrsResponse {
+
+  implicit val reads: Reads[NrsResponse] = Json.reads[NrsResponse]
+}
