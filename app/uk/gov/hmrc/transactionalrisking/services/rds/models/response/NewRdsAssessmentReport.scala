@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.rds.models.response
+package uk.gov.hmrc.transactionalrisking.services.rds.models.response
 
 import play.api.libs.functional.syntax.{toFunctionalBuilderOps, unlift}
 import play.api.libs.json.{JsObject, JsPath, Reads, Writes}
-import uk.gov.hmrc.transactionalrisking.rds.models.response.NewRdsAssessmentReport.{IdentifiersWrapper, Output}
+import NewRdsAssessmentReport.{IdentifiersWrapper, Output}
 
 import java.util.UUID
 

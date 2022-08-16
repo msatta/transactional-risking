@@ -32,6 +32,14 @@ class AppConfig @Inject()(config: ServicesConfig,configuration: Configuration) {
   val nrsApiKey: String = config.getString("access-keys.xApiKey")
   private val nrsConfig = configuration.get[Configuration]("microservice.services.non-repudiation")
   val nrsBaseUrl: String = config.baseUrl("non-repudiation")
+
+  private val rdsConfig = configuration.get[Configuration]("microservice.services.rds")
+  val rdsBaseUrlForSubmit:String = config.baseUrl("rds")+rdsConfig.get[String]("submit-url")
+  val rdsBaseUrlForAcknowledge:String = config.baseUrl("rds")+rdsConfig.get[String]("submit-url")
+
+  private val cipConfig = configuration.get[Configuration]("microservice.services.cip")
+  val cipFraudServiceBaseUrl:String = config.baseUrl("cip-fraud-service")+cipConfig.get[String]("submit-url")
+
   lazy val nrsRetries: List[FiniteDuration] =
     Retrying.fibonacciDelays(getFiniteDuration(nrsConfig, "initialDelay"), nrsConfig.get[Int]("numberOfRetries"))
 

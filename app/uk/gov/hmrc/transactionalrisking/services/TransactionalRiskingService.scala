@@ -20,21 +20,29 @@ import play.api.Logger
 import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.transactionalrisking.config.AppConfig
+import uk.gov.hmrc.transactionalrisking.controllers.UserRequest
 import uk.gov.hmrc.transactionalrisking.model.domain.{AssessmentReport, AssessmentRequestForSelfAssessment, FraudDecision, FraudRiskReport, FraudRiskRequest, Link, Origin, Risk}
-import uk.gov.hmrc.transactionalrisking.rds.models.response.NewRdsAssessmentReport
+import uk.gov.hmrc.transactionalrisking.services.cip.InsightService
 import uk.gov.hmrc.transactionalrisking.services.nrs.NrsService
+import uk.gov.hmrc.transactionalrisking.services.nrs.models.request.{AssistReportGenerated, SubmitRequest, SubmitRequestBody}
+import uk.gov.hmrc.transactionalrisking.services.rds.models.response.NewRdsAssessmentReport
+import uk.gov.hmrc.transactionalrisking.utils.CurrentDateTime
 import uk.gov.hmrc.transactionalriskingsimulator.services.ris.RdsAssessmentRequestForSelfAssessment
 import uk.gov.hmrc.transactionalriskingsimulator.services.ris.RdsAssessmentRequestForSelfAssessment.{DataWrapper, MetadataWrapper}
 
 import java.util.UUID
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext.Implicits._
-import scala.concurrent.Future
+//import scala.concurrent.ExecutionContext.Implicits._
+import scala.concurrent.{ ExecutionContext, Future }
 
 
 class TransactionalRiskingService @Inject()(val wsClient: WSClient,
-                                            val nonRepudiationService: NrsService
-                                            //                                            val fraudRiskService: InsightService,
+                                            nonRepudiationService: NrsService,
+                                            appConfig: AppConfig,
+                                            insightService: InsightService,
+                                            currentDateTime: CurrentDateTime,
                                             //                                            val nonRepudiationService: NonRepudiationService,
                                             //                                            val auditService: AuditService
                                                                                         ) {
@@ -43,14 +51,16 @@ class TransactionalRiskingService @Inject()(val wsClient: WSClient,
 
   //TODO  Fix me, create an entity to hold these info
 
-  def assess(request: AssessmentRequestForSelfAssessment,origin: Origin): Future[AssessmentReport] = {
+  def assess(request: AssessmentRequestForSelfAssessment,origin: Origin)(implicit hc: HeaderCarrier,
+                                                                         ec: ExecutionContext,
+//                                                                         logContext: EndpointLogContext,
+                                                                         userRequest: UserRequest[_],
+                                                                         correlationId: String): Future[AssessmentReport] = {
     logger.info("Received a request to generate an assessment ...")
 //    doImplicitAuditing() // TODO: This should be at the controller level.
 //    doExplicitAuditingForGenerationRequest()
-//    val fraudRiskReport = fraudRiskService.assess(generateFraudRiskRequest(request))
-    //TODO fix me later by calling the above service
-    val fraudRiskReport = FraudRiskReport(FraudDecision.Accept, 1, Set.empty, Set.empty)
-    assess(toNewRdsAssessmentRequestForSelfAssessment(request, fraudRiskReport))
+    val fraudRiskReport = insightService.assess(generateFraudRiskRequest(request))
+    val rdsAssessmentReportResponse: Future[AssessmentReport] = assess(toNewRdsAssessmentRequestForSelfAssessment(request, fraudRiskReport))
       .map(toAssessmentReport)
       .map(assessmentReport => {
         logger.info("... returning it.")
@@ -58,6 +68,15 @@ class TransactionalRiskingService @Inject()(val wsClient: WSClient,
         assessmentReport
       }
       )
+     rdsAssessmentReportResponse.map{ rdsReport =>
+      val submissionTimestamp = currentDateTime.getDateTime
+      val nrsId = request.nino //TODO generate nrs id as per the spec
+       val submitRequest = SubmitRequest(nrsId,SubmitRequestBody(rdsReport.toString,request.calculationId.toString) )
+      //Submit asynchronously to NRS //TODO fix me rdsReport.get
+      nonRepudiationService.submit(submitRequest, nrsId, submissionTimestamp,AssistReportGenerated)
+      rdsReport
+    }
+
   }
 
 //  def acknowledge(request: AcknowledgementRequestForSelfAssessment, origin: Origin): Future[Unit] = {
@@ -71,20 +90,23 @@ class TransactionalRiskingService @Inject()(val wsClient: WSClient,
 //    })
 //  }
 
-  def find(id: UUID): Future[Option[AssessmentReport]] =
+/*  def find(id: UUID): Future[Option[AssessmentReport]] =
     wsClient
-      .url(s"$baseUrlForRdsAssessments/$id")
+//      .url(s"$baseUrlForRdsAssessments/$id")
+      .url(s"$baseUrlForRdsAssessmentsSubmit/$id")
       .get().map(response =>
       response.status match {
         case Status.OK => Some(response.json.validate[NewRdsAssessmentReport].get)
         case Status.NOT_FOUND => None
         case unexpectedStatus => throw new RuntimeException(s"Unexpected status when attempting to get the assessment report from RDS: [$unexpectedStatus]")
       }
-    ).map(opt => opt.map(toAssessmentReport))
+    ).map(opt => opt.map(toAssessmentReport))*/
 
-  private def assess(request: RdsAssessmentRequestForSelfAssessment): Future[NewRdsAssessmentReport] =
+  //TODO move this to RDS connector
+  private def assess(request: RdsAssessmentRequestForSelfAssessment)(implicit ec: ExecutionContext): Future[NewRdsAssessmentReport] =
     wsClient
-      .url(baseUrlForRdsAssessments)
+//      .url(baseUrlForRdsAssessments)//TODO RDS check is this for ack
+      .url(baseUrlForRdsAssessmentsSubmit)//TODO RDS check is this for ack
       .post(Json.toJson(request))
       .map(response =>
         response.status match {
@@ -93,8 +115,12 @@ class TransactionalRiskingService @Inject()(val wsClient: WSClient,
         }
       )
 
-  private def baseUrlForRdsAssessments = s"http://localhost:$port/rds/assessments/sa"
+//  private def baseUrlForRdsAssessments = s"http://localhost:$port/rds/assessments/sa"
+//  private def baseUrlForRdsAssessments = s"${appConfig.rdsBaseUrlForSubmit}"
+  private def baseUrlForRdsAssessmentsSubmit = s"${appConfig.rdsBaseUrlForSubmit}"
+  private def baseUrlForCip = s"${appConfig.cipFraudServiceBaseUrl}"
 
+//  private def baseUrlForAcknowledgedRdsAssessments = s"http://localhost:$port/rds/acknowledged_assessments/sa"
   private def baseUrlForAcknowledgedRdsAssessments = s"http://localhost:$port/rds/acknowledged_assessments/sa"
 
 

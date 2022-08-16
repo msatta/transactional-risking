@@ -38,13 +38,14 @@ class NrsService @Inject()(
                            hashUtil: HashUtil) extends Logging {
 //                           override val metrics: Metrics) extends Timer with Logging { TODO include metrics later
 
-  def submit(vatSubmission: SubmitRequest, generatedNrsId: String, submissionTimestamp: OffsetDateTime,notableEventType: NotableEventType)(
+  def submit(selfAssessmentSubmission: SubmitRequest, generatedNrsId: String, submissionTimestamp: OffsetDateTime, notableEventType: NotableEventType)(
     implicit request: UserRequest[_],
     hc: HeaderCarrier,
     ec: ExecutionContext,
-    correlationId: String): Future[Option[NrsResponse]] = {
+    correlationId: String
+   ): Future[Option[NrsResponse]] = {
 
-    val nrsSubmission = buildNrsSubmission(vatSubmission, submissionTimestamp, request,notableEventType)
+    val nrsSubmission = buildNrsSubmission(selfAssessmentSubmission, submissionTimestamp, request,notableEventType)
 
 //    def audit(resp: NrsOutcome): Future[AuditResult] = resp match {
 //      case Left(err) => logger.info(s"left message")

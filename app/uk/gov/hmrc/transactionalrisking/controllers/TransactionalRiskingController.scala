@@ -16,19 +16,17 @@
 
 package uk.gov.hmrc.transactionalrisking.controllers
 
-import play.api.Logger
 import play.api.libs.json._
 import play.api.mvc._
-import uk.gov.hmrc.transactionalrisking.model.AuthorisationInfo
-import uk.gov.hmrc.transactionalrisking.model.domain.{AssessmentReport, AssessmentRequestForSelfAssessment, CalculationInfo, CustomerType, Internal, PreferredLanguage}
-import uk.gov.hmrc.transactionalrisking.services.TransactionalRiskingService
-import uk.gov.hmrc.transactionalrisking.services.auth.AuthService
+import uk.gov.hmrc.transactionalrisking.model.domain._
 import uk.gov.hmrc.transactionalrisking.services.eis.IntegrationFrameworkService
+import uk.gov.hmrc.transactionalrisking.services.{EnrolmentsAuthService, TransactionalRiskingService}
+import uk.gov.hmrc.transactionalrisking.utils.Logging
 
 import java.util.UUID
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext.Implicits._
-import scala.concurrent.Future
+//import scala.concurrent.ExecutionContext.Implicits._
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 /**
@@ -46,13 +44,13 @@ import scala.util.Try
  *
  */
 class TransactionalRiskingController @Inject()(
-                                                val controllerComponents: ControllerComponents,
+                                                val cc: ControllerComponents,
                                                 val transactionalRiskingService: TransactionalRiskingService,
                                                 val integrationFrameworkService: IntegrationFrameworkService,
-                                                val authService: AuthService //TODO may be use EnrolmentsService
-                                              ) extends BaseController {
+                                                val authService: EnrolmentsAuthService //TODO may be use EnrolmentsService
+                                              )(implicit ec: ExecutionContext) extends AuthorisedController(cc) with BaseController with Logging {
 
-  val logger: Logger = Logger("TransactionalRiskingController")
+  //  val logger: Logger = Logger("TransactionalRiskingController")
 
   /*
   The Client asks TRS to generate a report.
@@ -68,28 +66,29 @@ TRS uses AS to record explicit event(s) related to this assessment request, incl
 TRS returns a 200 with a JSON representation of the report.
    */
 
-  def generateReportInternal(nino: String, calculationId: String) = Action.async { implicit request =>
+  def generateReportInternal(nino: String, calculationId: String) =
+    authorisedAction(nino, nrsRequired = true).async { implicit request =>
+      implicit val correlationId: String = UUID.randomUUID().toString
+      // val report = Future(Ok("Report"))
+      val customerType = deriveCustomerType(request)
+      toId(calculationId).map { calculationIdUuid =>
+        val calculationInfo = getCalculationInfo(calculationIdUuid, nino)
+        //val report = connector.generateReport(nino, calculationId).map(g => Ok(g.message))
+        //TODO fix me later, hardcoded request
+        val assessmentRequestForSelfAssessment = new AssessmentRequestForSelfAssessment(calculationIdUuid,
+          nino,
+          PreferredLanguage.English,
+          customerType,
+          None,
+          calculationInfo.taxYear)
 
-    // val report = Future(Ok("Report"))
-    val customerType = deriveCustomerType(request)
-    toId(calculationId).map { calculationIdUuid =>
-      val calculationInfo = getCalculationInfo(calculationIdUuid, nino)
-      //val report = connector.generateReport(nino, calculationId).map(g => Ok(g.message))
-      //TODO fix me later, hardcoded request
-      val assessmentRequestForSelfAssessment = new AssessmentRequestForSelfAssessment(calculationIdUuid,
-        nino,
-        PreferredLanguage.English,
-        customerType,
-        None,
-        calculationInfo.taxYear)
-
-      Future(
-        transactionalRiskingService.assess(assessmentRequestForSelfAssessment, Internal)
-          .map(Json.toJson[AssessmentReport])
-          .map(js => Ok(js))
-      ).flatten
-    }.getOrElse(Future(BadRequest(asError("Please provide the ID of an Assessment Report."))))
-  }
+        Future(
+          transactionalRiskingService.assess(assessmentRequestForSelfAssessment, Internal)
+            .map(Json.toJson[AssessmentReport])
+            .map(js => Ok(js))
+        ).flatten
+      }.getOrElse(Future(BadRequest(asError("Please provide the ID of an Assessment Report."))))
+    }
 
   private def deriveCustomerType(request: Request[AnyContent]) = {
     //TODO fix me, write logic to derive customer type
@@ -154,16 +153,16 @@ TRS returns a 200 with a JSON representation of the report.
     integrationFrameworkService.getCalculationInfo(id, nino)
       .getOrElse(throw new RuntimeException(s"Unknown calculation for id [$id] and nino [$nino]"))
 
-  private def getAuthorisationInfo(request: Request[_]): AuthorisationInfo =
-    authService.getAuthorisationInfo(request)
+  //  private def getAuthorisationInfo(request: Request[_]): AuthorisationInfo =
+  //    authService.getAuthorisationInfo(request)
 
-//  private def getPreferredLanguage(request: Request[_]): PreferredLanguage = English
+  //  private def getPreferredLanguage(request: Request[_]): PreferredLanguage = English
 
   //  def externalAcknowledgeAssessmentForSelfAssessment(rawId: String): Action[AnyContent] = acknowledgeAssessmentForSelfAssessment(rawId, External)
 
-//  private def asError(errors: Seq[(JsPath, Seq[JsonValidationError])]): JsObject = asError(JsError.toJson(errors))
+  //  private def asError(errors: Seq[(JsPath, Seq[JsonValidationError])]): JsObject = asError(JsError.toJson(errors))
 
-//  private def asError(json: JsObject): JsObject = Json.obj("message" -> json)
+  //  private def asError(json: JsObject): JsObject = Json.obj("message" -> json)
 
 
 }
