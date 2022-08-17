@@ -37,7 +37,7 @@ class AppConfig @Inject()(config: ServicesConfig,configuration: Configuration) {
   val rdsBaseUrlForSubmit:String = config.baseUrl("rds")+rdsConfig.get[String]("submit-url")
   val rdsBaseUrlForAcknowledge:String = config.baseUrl("rds")+rdsConfig.get[String]("submit-url")
 
-  private val cipConfig = configuration.get[Configuration]("microservice.services.cip")
+  private val cipConfig = configuration.get[Configuration]("microservice.services.cip-fraud-service")
   val cipFraudServiceBaseUrl:String = config.baseUrl("cip-fraud-service")+cipConfig.get[String]("submit-url")
 
   lazy val nrsRetries: List[FiniteDuration] =

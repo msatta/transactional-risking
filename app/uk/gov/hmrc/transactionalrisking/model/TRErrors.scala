@@ -66,9 +66,9 @@ object TRErrorWrapper {
 object NrsError extends TRError("NRS_SUBMISSION_FAILURE", "The submission to NRS from MDTP failed")
 
 // Format Errors
-object VrnFormatError extends TRError("VRN_INVALID", "The provided Vrn is invalid")
-object VrnFormatErrorDes extends TRError("VRN_INVALID", "The provided VRN is invalid")
-object VrnNotFound extends TRError("VRN_NOT_FOUND", "The provided VRN was not found")
+object NinoFormatError extends TRError("VRN_INVALID", "The provided Vrn format is invalid")
+object NinoFormatErrorDes extends TRError("VRN_INVALID", "The provided VRN is invalid")
+object NinoNotFound extends TRError("VRN_NOT_FOUND", "The provided VRN was not found")
 
 // Rule Errors
 //object RuleIncorrectOrEmptyBodyError extends TRError("RULE_INCORRECT_OR_EMPTY_BODY_SUBMITTED", "An empty or non-matching body was submitted")

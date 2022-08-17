@@ -22,7 +22,7 @@ import uk.gov.hmrc.auth.core.Enrolment
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-import uk.gov.hmrc.transactionalrisking.model.{DownstreamError, ForbiddenDownstreamError, LegacyUnauthorisedError, VrnFormatError}
+import uk.gov.hmrc.transactionalrisking.model.{DownstreamError, ForbiddenDownstreamError, LegacyUnauthorisedError, NinoFormatError}
 import uk.gov.hmrc.transactionalrisking.model.auth.UserDetails
 import uk.gov.hmrc.transactionalrisking.model.domain.Nino
 import uk.gov.hmrc.transactionalrisking.services.EnrolmentsAuthService
@@ -64,7 +64,7 @@ abstract class AuthorisedController(cc: ControllerComponents)(implicit ec: Execu
           case Left(_) => Future.successful(InternalServerError(Json.toJson(DownstreamError)))
         }
       } else {
-        Future.successful(BadRequest(Json.toJson(VrnFormatError)))
+        Future.successful(BadRequest(Json.toJson(NinoFormatError)))
       }
     }
   }
