@@ -17,7 +17,7 @@
 package uk.gov.hmrc.transactionalrisking.services.eis
 
 import play.api.Logger
-import uk.gov.hmrc.transactionalrisking.model.domain.CalculationInfo
+import uk.gov.hmrc.transactionalrisking.models.domain.CalculationInfo
 
 import java.util.UUID
 

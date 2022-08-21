@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.model
+package uk.gov.hmrc.transactionalrisking.models
 
-import play.api.libs.json.{JsObject, JsValue, Json, Reads, Writes, OWrites}
+import play.api.libs.json.{JsObject, JsValue, Json, OWrites, Reads, Writes}
 
 //TODO Revisit below error scenarios
 /*
@@ -31,24 +31,24 @@ Calculation ID isn't recognised.
 Calculation ID is for a calculation which is irrelevant for that NINO.
  */
 
-case class TRError(code: String, message: String, customJson: Option[JsValue] = None){
+case class MtdError(code: String, message: String, customJson: Option[JsValue] = None){
   lazy val toJson: JsValue = Json.obj(
     "code" -> this.code,
     "message" -> this.message
   )
 }
 
-object TRError {
-  implicit val writes: Writes[TRError] = {
-    case o@TRError(_, _, None) => o.toJson
-    case TRError("INVALID_REQUEST", _, Some(customJson)) => BadRequestError.toJson.as[JsObject] + ("errors" -> Json.toJson(Seq(customJson)))
-    case TRError(_, _, Some(customJson)) => customJson
+object MtdError {
+  implicit val writes: Writes[MtdError] = {
+    case o@MtdError(_, _, None) => o.toJson
+    case MtdError("INVALID_REQUEST", _, Some(customJson)) => BadRequestError.toJson.as[JsObject] + ("errors" -> Json.toJson(Seq(customJson)))
+    case MtdError(_, _, Some(customJson)) => customJson
   }
 
-  implicit def genericWrites[T <: TRError]: Writes[T] =
-    writes.contramap[T](c => c: TRError)
+  implicit def genericWrites[T <: MtdError]: Writes[T] =
+    writes.contramap[T](c => c: MtdError)
 
-  implicit val reads: Reads[TRError] = Json.reads[TRError]
+  implicit val reads: Reads[MtdError] = Json.reads[MtdError]
 }
 
 case class TRErrorWrapper(code: String, message: String, path: Option[String], errors: Option[Seq[TRErrorWrapper]] = None)
@@ -63,36 +63,40 @@ object TRErrorWrapper {
 }
 
 //NRS error
-object NrsError extends TRError("NRS_SUBMISSION_FAILURE", "The submission to NRS from MDTP failed")
+object NrsError extends MtdError("NRS_SUBMISSION_FAILURE", "The submission to NRS from MDTP failed")
 
 // Format Errors
-object NinoFormatError extends TRError("VRN_INVALID", "The provided Vrn format is invalid")
-object NinoFormatErrorDes extends TRError("VRN_INVALID", "The provided VRN is invalid")
-object NinoNotFound extends TRError("VRN_NOT_FOUND", "The provided VRN was not found")
+object NinoFormatError extends MtdError("NINO_INVALID", "The provided NINO format is invalid")
+object NinoFormatErrorDes extends MtdError("NINO_INVALID", "The provided NINO is invalid")
+object NinoNotFound extends MtdError("NINO_NOT_FOUND", "The provided NINO was not found")
+object CalculationIdFormatError
+  extends MtdError(code = "FORMAT_CALC_ID",
+  message = "The provided Calculation ID is invalid"
+  )
 
 // Rule Errors
 //object RuleIncorrectOrEmptyBodyError extends TRError("RULE_INCORRECT_OR_EMPTY_BODY_SUBMITTED", "An empty or non-matching body was submitted")
 //object RuleInsolventTraderError extends TRError("RULE_INSOLVENT_TRADER", "The remote endpoint has indicated that the Trader is insolvent")
 
 // Standard Errors
-object NotFoundError extends TRError("MATCHING_RESOURCE_NOT_FOUND", "Matching resource not found")
-object DownstreamError extends TRError("INTERNAL_SERVER_ERROR", "An internal server error occurred")
-object BadRequestError extends TRError("INVALID_REQUEST", "Invalid request")
+object NotFoundError extends MtdError("MATCHING_RESOURCE_NOT_FOUND", "Matching resource not found")
+object DownstreamError extends MtdError("INTERNAL_SERVER_ERROR", "An internal server error occurred")
+object BadRequestError extends MtdError("INVALID_REQUEST", "Invalid request")
 //object BVRError extends TRError("BUSINESS_ERROR", "Business validation error")
-object ServiceUnavailableError extends TRError("SERVICE_UNAVAILABLE", "Internal server error")
-object InvalidJson extends TRError("INVALID_JSON", "Invalid JSON received")
+object ServiceUnavailableError extends MtdError("SERVICE_UNAVAILABLE", "Internal server error")
+object InvalidJson extends MtdError("INVALID_JSON", "Invalid JSON received")
 object UnexpectedFailure {
-  def trError(status: Int, body: String): TRError = TRError("UNEXPECTED_FAILURE", s"Unexpected failure. Status $status, body $body")
+  def trError(status: Int, body: String): MtdError = MtdError("UNEXPECTED_FAILURE", s"Unexpected failure. Status $status, body $body")
 }
 
 // Authorisation Errors
-object UnauthorisedError extends TRError("CLIENT_OR_AGENT_NOT_AUTHORISED", "The client and/or agent is not authorised")
-object InvalidBearerTokenError extends TRError("UNAUTHORIZED", "Bearer token is missing or not authorized")
+object UnauthorisedError extends MtdError("CLIENT_OR_AGENT_NOT_AUTHORISED", "The client and/or agent is not authorised")
+object InvalidBearerTokenError extends MtdError("UNAUTHORIZED", "Bearer token is missing or not authorized")
 
 // Legacy Authorisation Errors
-object LegacyUnauthorisedError extends TRError("CLIENT_OR_AGENT_NOT_AUTHORISED", "The client and/or agent is not authorised.")
+object LegacyUnauthorisedError extends MtdError("CLIENT_OR_AGENT_NOT_AUTHORISED", "The client and/or agent is not authorised.")
 
-object ForbiddenDownstreamError extends TRError(
+object ForbiddenDownstreamError extends MtdError(
   code = "INTERNAL_SERVER_ERROR",
   message = "An internal server error occurred",
   customJson = Some(
@@ -108,9 +112,9 @@ object ForbiddenDownstreamError extends TRError(
 )
 
 // Accept header Errors
-object InvalidAcceptHeaderError extends TRError("ACCEPT_HEADER_INVALID", "The accept header is missing or invalid")
-object UnsupportedVersionError extends TRError("NOT_FOUND", "The requested resource could not be found")
-object InvalidBodyTypeError extends TRError("INVALID_BODY_TYPE", "Expecting text/json or application/json body")
+object InvalidAcceptHeaderError extends MtdError("ACCEPT_HEADER_INVALID", "The accept header is missing or invalid")
+object UnsupportedVersionError extends MtdError("NOT_FOUND", "The requested resource could not be found")
+object InvalidBodyTypeError extends MtdError("INVALID_BODY_TYPE", "Expecting text/json or application/json body")
 
 // Custom VAT errors
 //object LegacyNotFoundError extends TRError("NOT_FOUND", "The remote endpoint has indicated that no data can be found")

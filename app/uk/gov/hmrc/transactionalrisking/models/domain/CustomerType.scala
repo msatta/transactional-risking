@@ -14,12 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.model
+package uk.gov.hmrc.transactionalrisking.models.domain
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, Reads}
 
-case class Greeting(message: String)
+object CustomerType extends Enumeration {
 
-object Greeting {
-  implicit val format = Json.format[Greeting]
+  type CustomerType = Value
+
+  val TaxPayer: CustomerType.Value = Value("T")
+  val Agent: CustomerType.Value = Value("A")
+
+  implicit val reads: Reads[CustomerType] =
+    Json.formatEnum(CustomerType)
+
 }
+

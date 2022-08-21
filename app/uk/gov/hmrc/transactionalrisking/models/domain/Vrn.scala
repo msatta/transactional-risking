@@ -14,19 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.model.domain
+package uk.gov.hmrc.transactionalrisking.models.domain
 
-import play.api.libs.json.{Format, Json}
-import uk.gov.hmrc.transactionalrisking.model.domain
-
-object PreferredLanguage extends Enumeration {
-
-  type PreferredLanguage = Value
-
-  val English: domain.PreferredLanguage.Value = Value("EN")
-  val Welsh: domain.PreferredLanguage.Value = Value("CY")
-
-  implicit val format: Format[PreferredLanguage] = Json.formatEnum(PreferredLanguage)
-
+case class Vrn(vrn: String) {
+  override def toString: String = vrn
+  val name = "vrn"
+  def value: String = vrn
 }
-

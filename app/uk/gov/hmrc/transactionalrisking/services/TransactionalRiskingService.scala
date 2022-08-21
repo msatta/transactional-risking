@@ -23,7 +23,7 @@ import play.api.libs.ws.WSClient
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.transactionalrisking.config.AppConfig
 import uk.gov.hmrc.transactionalrisking.controllers.UserRequest
-import uk.gov.hmrc.transactionalrisking.model.domain.{AssessmentReport, AssessmentRequestForSelfAssessment, FraudDecision, FraudRiskReport, FraudRiskRequest, Link, Origin, Risk}
+import uk.gov.hmrc.transactionalrisking.models.domain.{AssessmentReport, AssessmentRequestForSelfAssessment, FraudDecision, FraudRiskReport, FraudRiskRequest, Link, Origin, Risk}
 import uk.gov.hmrc.transactionalrisking.services.cip.InsightService
 import uk.gov.hmrc.transactionalrisking.services.nrs.NrsService
 import uk.gov.hmrc.transactionalrisking.services.nrs.models.request.{AssistReportGenerated, SubmitRequest, SubmitRequestBody}
@@ -32,10 +32,8 @@ import uk.gov.hmrc.transactionalrisking.utils.CurrentDateTime
 import uk.gov.hmrc.transactionalriskingsimulator.services.ris.RdsAssessmentRequestForSelfAssessment
 import uk.gov.hmrc.transactionalriskingsimulator.services.ris.RdsAssessmentRequestForSelfAssessment.{DataWrapper, MetadataWrapper}
 
-import java.util.UUID
 import javax.inject.Inject
-//import scala.concurrent.ExecutionContext.Implicits._
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 
 class TransactionalRiskingService @Inject()(val wsClient: WSClient,
@@ -49,8 +47,6 @@ class TransactionalRiskingService @Inject()(val wsClient: WSClient,
 
   val logger: Logger = Logger("TransactionalRiskingService")
 
-  //TODO  Fix me, create an entity to hold these info
-
   def assess(request: AssessmentRequestForSelfAssessment,origin: Origin)(implicit hc: HeaderCarrier,
                                                                          ec: ExecutionContext,
 //                                                                         logContext: EndpointLogContext,
@@ -61,7 +57,7 @@ class TransactionalRiskingService @Inject()(val wsClient: WSClient,
 //    doExplicitAuditingForGenerationRequest()
     val fraudRiskReport = insightService.assess(generateFraudRiskRequest(request))
     val rdsAssessmentReportResponse: Future[AssessmentReport] = assess(toNewRdsAssessmentRequestForSelfAssessment(request, fraudRiskReport))
-      .map(toAssessmentReport)
+      .map(toAssessmentReport(_,request))
       .map(assessmentReport => {
         logger.info("... returning it.")
         // TODO: Should we also audit an explicit event for actually generating the assessment?
@@ -120,7 +116,6 @@ class TransactionalRiskingService @Inject()(val wsClient: WSClient,
   private def baseUrlForRdsAssessmentsSubmit = s"${appConfig.rdsBaseUrlForSubmit}"
   private def baseUrlForCip = s"${appConfig.cipFraudServiceBaseUrl}"
 
-//  private def baseUrlForAcknowledgedRdsAssessments = s"http://localhost:$port/rds/acknowledged_assessments/sa"
   private def baseUrlForAcknowledgedRdsAssessments = s"http://localhost:$port/rds/acknowledged_assessments/sa"
 
 
@@ -138,8 +133,11 @@ class TransactionalRiskingService @Inject()(val wsClient: WSClient,
   private def port: String = System.getProperty("http.port", "9000")
 
 
-  private def toAssessmentReport(report: NewRdsAssessmentReport) = {
-    AssessmentReport(report.calculationId, risks(report))
+  private def toAssessmentReport(report: NewRdsAssessmentReport,request:AssessmentRequestForSelfAssessment) = {
+   //TODO check should this be calculationId or feedbackId?
+    AssessmentReport(reportId=report.calculationId,
+      risks=risks(report),nino=request.nino,taxYear = request.taxYear,
+      calculationId = request.calculationId)
   }
 
   private def risks(report: NewRdsAssessmentReport): Seq[Risk] =
@@ -153,7 +151,7 @@ class TransactionalRiskingService @Inject()(val wsClient: WSClient,
       .map(toRisk)
 
 
-  private def toRisk(riskParts: Seq[String]) = Risk(riskParts(1), riskParts(2), Seq(Link(riskParts(3), riskParts(4))))
+  private def toRisk(riskParts: Seq[String]) = Risk(title=riskParts(0), body=riskParts(1), action=riskParts(2), links=Seq(Link(riskParts(3), riskParts(4))),path=riskParts(5))
 
   private def toNewRdsAssessmentRequestForSelfAssessment(request: AssessmentRequestForSelfAssessment, fraudRiskReport: FraudRiskReport): RdsAssessmentRequestForSelfAssessment
   = RdsAssessmentRequestForSelfAssessment(
@@ -188,7 +186,7 @@ class TransactionalRiskingService @Inject()(val wsClient: WSClient,
     )
   )
 
-
+//TODO Revisit Check headers as pending
   private def generateFraudRiskRequest(request: AssessmentRequestForSelfAssessment): FraudRiskRequest = {
     val fraudRiskHeaders = Map.empty[String, String]
     new FraudRiskRequest(

@@ -19,7 +19,7 @@ package uk.gov.hmrc.transactionalrisking.connectors
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.transactionalrisking.model.Greeting
+import uk.gov.hmrc.transactionalrisking.models.Greeting
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}

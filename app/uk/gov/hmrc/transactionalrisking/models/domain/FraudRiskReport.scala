@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.model.domain
+package uk.gov.hmrc.transactionalrisking.models.domain
 
 import play.api.libs.functional.syntax.{toFunctionalBuilderOps, unlift}
 import play.api.libs.json.{JsPath, Reads, Writes}
-import uk.gov.hmrc.transactionalrisking.model.domain.FraudDecision.FraudRiskDecision
+import uk.gov.hmrc.transactionalrisking.models.domain.FraudDecision.FraudRiskDecision
 import uk.gov.hmrc.transactionalriskingsimulator.domain.WatchlistFlag
 
 

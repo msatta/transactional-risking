@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.services.auth
+package uk.gov.hmrc.transactionalrisking.models.domain
 
-import play.api.mvc.Request
-import uk.gov.hmrc.transactionalrisking.models.AuthorisationInfo
-import uk.gov.hmrc.transactionalrisking.models.domain.CustomerType
+import uk.gov.hmrc.transactionalrisking.models.domain.FraudRiskRequest.FraudRiskHeaders
 
-/**
- * I'd recommend that you look at: https://github.com/hmrc/auth-client
- */
-class AuthService {
+// This is still being determined; please see TRDT-85.//TODO revisit me later
+class FraudRiskRequest(nino: String, taxYear: String, fraudRiskHeaders: FraudRiskHeaders)
 
-  def getAuthorisationInfo(request: Request[_]): AuthorisationInfo =
-    AuthorisationInfo("QQ123456A", CustomerType.TaxPayer, None)
-
+object FraudRiskRequest {
+  type FraudRiskHeaders = Map[String, String]
 }

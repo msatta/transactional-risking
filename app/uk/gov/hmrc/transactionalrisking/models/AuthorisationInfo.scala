@@ -14,21 +14,8 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.model.domain
+package uk.gov.hmrc.transactionalrisking.models
 
-import play.api.libs.functional.syntax.{toFunctionalBuilderOps, unlift}
-import play.api.libs.json.{JsPath, Reads, Writes}
-
-case class FraudRiskHeader(key: String, value: String)
-
-object FraudRiskHeader {
-
-  implicit val reads: Reads[FraudRiskHeader] =
-    (JsPath \ "key").read[String]
-      .and((JsPath \ "value").read[String])(FraudRiskHeader.apply _)
-
-  implicit val writes: Writes[FraudRiskHeader] =
-    (JsPath \ "key").write[String]
-      .and((JsPath \ "value").write[String])(unlift(FraudRiskHeader.unapply))
-
-}
+import uk.gov.hmrc.transactionalrisking.models.domain.CustomerType.CustomerType
+//Simulator
+case class AuthorisationInfo(nino: String, customerType: CustomerType, agentRef: Option[String]=None)

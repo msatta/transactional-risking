@@ -27,7 +27,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.transactionalrisking.connectors.GreetingConnector
-import uk.gov.hmrc.transactionalrisking.model.Greeting
+import uk.gov.hmrc.transactionalrisking.models.Greeting
 
 import scala.concurrent.Future
 

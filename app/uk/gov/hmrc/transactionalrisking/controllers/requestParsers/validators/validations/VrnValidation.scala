@@ -16,13 +16,13 @@
 
 package uk.gov.hmrc.transactionalrisking.controllers.requestParsers.validators.validations
 
-import uk.gov.hmrc.transactionalrisking.model.{TRError, NinoFormatError}
+import uk.gov.hmrc.transactionalrisking.models.{MtdError, NinoFormatError}
 
 object VrnValidation {
   private val vrnRegex = """^\d{9}$"""
   val NoValidationErrors = List()
 
-  def validate(vrn: String): List[TRError] = {
+  def validate(vrn: String): List[MtdError] = {
     if (vrn.matches(vrnRegex)) NoValidationErrors else List(NinoFormatError)
   }
 }

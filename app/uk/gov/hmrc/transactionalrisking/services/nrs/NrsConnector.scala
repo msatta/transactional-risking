@@ -39,10 +39,10 @@ class NrsConnector @Inject()(val httpClient: HttpClient,
     with Delayer
     with Logging {
 
-  private lazy val url: String    = s"${appConfig.nrsBaseUrl}/submission"
+  private lazy val url: String    = appConfig.nrsBaseUrl
   private lazy val apiKey: String = appConfig.nrsApiKey
 
-  def submit(nrsSubmission: NrsSubmission)(
+  def submit(nrsSubmission: NrsSubmission, reportId:String)(
     implicit hc: HeaderCarrier, correlationId: String): Future[NrsOutcome] = {
 
     val retryCondition: Try[NrsOutcome] => Boolean = {
@@ -55,12 +55,12 @@ class NrsConnector @Inject()(val httpClient: HttpClient,
       logger.info(s"Attempt $attemptNumber NRS submission: sending POST request to $url")
 
       httpClient
-        .POST[NrsSubmission, HttpResponse](url, nrsSubmission, Seq("X-API-Key" -> apiKey))
+        .POST[NrsSubmission, HttpResponse](s"$url/$reportId.", nrsSubmission, Seq("X-API-Key" -> apiKey))
         .map { response =>
           val status = response.status
 
           if (Status.isSuccessful(status)) {
-            logger.info("NRS submission successful")
+            logger.info(s"NRS submission successful")
             Right(response.json.as[NrsResponse])
           } else {
             logger.warn(s".CorrelationId: $correlationId\tRequestId:${hc.requestId}\nNRS submission failed with error: ${response.body}")

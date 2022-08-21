@@ -14,11 +14,6 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.model.auth
+package uk.gov.hmrc.transactionalrisking.models.request
 
-import uk.gov.hmrc.transactionalrisking.services.nrs.models.request.IdentityData
-
-case class UserDetails(userType: String,
-                       agentReferenceNumber: Option[String],
-                       clientId: String,
-                       identityData: Option[IdentityData] = None)
+trait RawData

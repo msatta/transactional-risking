@@ -14,9 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.model.domain
+package uk.gov.hmrc.transactionalrisking.models.domain
 
-sealed trait Origin
+import play.api.libs.json.{Format, Json}
+import uk.gov.hmrc.transactionalrisking.models.domain
 
-case object External extends Origin
-case object Internal extends Origin
+object PreferredLanguage extends Enumeration {
+
+  type PreferredLanguage = Value
+
+  val English: domain.PreferredLanguage.Value = Value("EN")
+  val Welsh: domain.PreferredLanguage.Value = Value("CY")
+
+  implicit val format: Format[PreferredLanguage] = Json.formatEnum(PreferredLanguage)
+
+}
+

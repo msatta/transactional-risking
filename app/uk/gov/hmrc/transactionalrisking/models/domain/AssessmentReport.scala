@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.model.domain
+package uk.gov.hmrc.transactionalrisking.models.domain
 
 import play.api.libs.functional.syntax.{toFunctionalBuilderOps, unlift}
 import play.api.libs.json.{JsPath, Writes}
@@ -22,24 +22,29 @@ import play.api.libs.json.{JsPath, Writes}
 import java.util.UUID
 
 // At this point, we don't expect that the report will differ according to the context.
-case class AssessmentReport(id: UUID, risks: Seq[Risk])
+case class AssessmentReport(reportId: UUID, risks: Seq[Risk],nino:String,taxYear: String,calculationId:UUID)
 
 object AssessmentReport {
 
   implicit val writes: Writes[AssessmentReport] =
-    (JsPath \ "id").write[UUID]
-      .and((JsPath \ "messages").write[Seq[Risk]])(unlift(AssessmentReport.unapply))
+    (JsPath \ "reportId").write[UUID]
+      .and((JsPath \ "messages").write[Seq[Risk]])
+      .and((JsPath \ "nino").write[String])
+      .and((JsPath \ "taxyear").write[String])
+      .and((JsPath \ "calculationId").write[UUID])(unlift(AssessmentReport.unapply))
 
 }
 
-case class Risk(body: String, action: String, links: Seq[Link])
+case class Risk(title:String,body: String, action: String, links: Seq[Link],path:String)
 
 object Risk {
 
   implicit val writes: Writes[Risk] =
-    (JsPath \ "body").write[String]
+    (JsPath \ "title").write[String]
+    .and((JsPath \ "body").write[String])
       .and((JsPath \ "action").write[String])
-      .and((JsPath \ "links").write[Seq[Link]])(unlift(Risk.unapply))
+      .and((JsPath \ "links").write[Seq[Link]])
+      .and((JsPath \ "path").write[String])(unlift(Risk.unapply))
 
 }
 

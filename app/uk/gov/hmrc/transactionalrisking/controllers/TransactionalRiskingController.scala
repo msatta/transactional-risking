@@ -18,7 +18,7 @@ package uk.gov.hmrc.transactionalrisking.controllers
 
 import play.api.libs.json._
 import play.api.mvc._
-import uk.gov.hmrc.transactionalrisking.model.domain._
+import uk.gov.hmrc.transactionalrisking.models.domain._
 import uk.gov.hmrc.transactionalrisking.services.eis.IntegrationFrameworkService
 import uk.gov.hmrc.transactionalrisking.services.{EnrolmentsAuthService, TransactionalRiskingService}
 import uk.gov.hmrc.transactionalrisking.utils.Logging
@@ -74,7 +74,6 @@ TRS returns a 200 with a JSON representation of the report.
       toId(calculationId).map { calculationIdUuid =>
         val calculationInfo = getCalculationInfo(calculationIdUuid, nino)
         //val report = connector.generateReport(nino, calculationId).map(g => Ok(g.message))
-        //TODO fix me later, hardcoded request
         val assessmentRequestForSelfAssessment = new AssessmentRequestForSelfAssessment(calculationIdUuid,
           nino,
           PreferredLanguage.English,

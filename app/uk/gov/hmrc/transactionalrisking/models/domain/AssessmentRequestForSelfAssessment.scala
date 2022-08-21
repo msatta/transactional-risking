@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.model.domain
+package uk.gov.hmrc.transactionalrisking.models.domain
 
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsPath, Reads}
-import uk.gov.hmrc.transactionalrisking.model.domain.CustomerType.CustomerType
-import uk.gov.hmrc.transactionalrisking.model.domain.PreferredLanguage.PreferredLanguage
+import uk.gov.hmrc.transactionalrisking.models.domain.CustomerType.CustomerType
+import uk.gov.hmrc.transactionalrisking.models.domain.PreferredLanguage.PreferredLanguage
 
 import java.util.UUID
 

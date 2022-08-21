@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.model.domain
-//TODO Do we need this class, there is another Nino class with one of the dependency
-case class Nino(nino: String) {
-  require(Nino.isValid(nino), s"$nino is not a valid nino.")
+package uk.gov.hmrc.transactionalrisking.models.domain
+//TODO This class was named as Nino, there is another Nino class with one of the dependency, Hence renamed it to
+// NinoChecker. Need to revisit
+case class NinoChecker(nino: String) {
+  require(NinoChecker.isValid(nino), s"$nino is not a valid nino.")
 
   private val LengthWithoutSuffix: Int = 8
   def value: String = nino
@@ -26,7 +27,7 @@ case class Nino(nino: String) {
   def withoutSuffix: String = value.take(LengthWithoutSuffix)
 }
 
-object Nino extends (String => Nino) {
+object NinoChecker extends (String => NinoChecker) {
   private val validNinoFormat = "[[A-Z]&&[^DFIQUV]][[A-Z]&&[^DFIQUVO]] ?\\d{2} ?\\d{2} ?\\d{2} ?[A-D]{1}"
   private val invalidPrefixes = List("BG", "GB", "NK", "KN", "TN", "NT", "ZZ")
 

@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.services.cip
+package uk.gov.hmrc.transactionalrisking.controllers.requestParsers.validators.validations
 
-import play.api.Logger
-import uk.gov.hmrc.transactionalrisking.models.domain.{FraudDecision, FraudRiskReport, FraudRiskRequest}
+import uk.gov.hmrc.transactionalrisking.models.{MtdError, NinoFormatError}
+import uk.gov.hmrc.transactionalrisking.models.domain.NinoChecker
 
-class InsightService() {
+object NinoValidation {
 
-  val logger: Logger = Logger("InsightService")
+  private val ninoRegex =
+    "^([ACEHJLMOPRSWXY][A-CEGHJ-NPR-TW-Z]|B[A-CEHJ-NPR-TW-Z]|G[ACEGHJ-NPR-TW-Z]|" +
+      "[KT][A-CEGHJ-MPR-TW-Z]|N[A-CEGHJL-NPR-SW-Z]|Z[A-CEGHJ-NPR-TW-Y])[0-9]{6}[A-D ]?$"
 
-  def assess(fraudRiskRequest: FraudRiskRequest): FraudRiskReport = {
-    logger.info(s"Received request for a fraud risk report ...")
-    val fraudRiskReport = FraudRiskReport(FraudDecision.Accept, 1, Set.empty, Set.empty)
-    logger.info("... returning it.")
-    fraudRiskReport
+  def validate(nino: String): List[MtdError] = {
+    if (NinoChecker.isValid(nino) && nino.matches(ninoRegex)) NoValidationErrors else List(NinoFormatError)
   }
 
 }
-

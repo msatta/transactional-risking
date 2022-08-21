@@ -14,15 +14,27 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.services
+package uk.gov.hmrc.transactionalrisking.controllers.requestParsers.validators
 
 import uk.gov.hmrc.transactionalrisking.models.MtdError
-import uk.gov.hmrc.transactionalrisking.services.nrs.models.response.{NrsFailure, NrsResponse}
+import uk.gov.hmrc.transactionalrisking.models.request.RawData
 
-import javax.xml.ws.ResponseWrapper
+trait Validator[A <: RawData] {
 
-package object nrs {
-  //TODO fix me
-//  type NrsServiceOutcome[Resp] = Either[ErrorWrapper, ResponseWrapper[Resp]]
-  type NrsOutcome = Either[NrsFailure, NrsResponse]
+  type ValidationLevel[T] = T => List[MtdError]
+
+  def validate(data: A): List[MtdError]
+
+  def run(validationSet: List[A => List[List[MtdError]]], data: A): List[MtdError] = {
+
+    validationSet match {
+      case Nil => List()
+      case thisLevel :: remainingLevels =>
+        thisLevel(data).flatten match {
+          case x if x.isEmpty  => run(remainingLevels, data)
+          case x if x.nonEmpty => x
+        }
+    }
+  }
+
 }

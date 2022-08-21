@@ -23,8 +23,8 @@ import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals._
 import uk.gov.hmrc.auth.core.retrieve.{ItmpAddress, ItmpName, ~}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.transactionalrisking.model.auth.{AuthOutcome, UserDetails}
-import uk.gov.hmrc.transactionalrisking.model.{DownstreamError, ForbiddenDownstreamError, LegacyUnauthorisedError, TRError}
+import uk.gov.hmrc.transactionalrisking.models.auth.{AuthOutcome, UserDetails}
+import uk.gov.hmrc.transactionalrisking.models.{DownstreamError, ForbiddenDownstreamError, LegacyUnauthorisedError, MtdError}
 import uk.gov.hmrc.transactionalrisking.services.nrs.models.request.IdentityData
 import uk.gov.hmrc.transactionalrisking.utils.Logging
 
@@ -40,6 +40,11 @@ class EnrolmentsAuthService @Inject()(val connector: AuthConnector) extends Logg
 
   def authorised(predicate: Predicate, nrsRequired: Boolean = false)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[AuthOutcome] = {
     if(!nrsRequired){
+      logger.info(s" property names are !nrsRequired")
+      logger.info(s" property names are ${allEnrolments.propertyNames}")
+      //TODO revisit below as this doesn't look right based on below doc
+      //https://confluence.tools.tax.service.gov.uk/display/GG/Predicate+Reference#PredicateReference-EnrolmentwithagentauthorisationbasedonNINO
+      //affinityGroup = "Individual" or "Organisation" is not reliable
       authFunction.authorised(predicate).retrieve(affinityGroup and allEnrolments) {
         case Some(Individual) ~ enrolments => createUserDetailsWithLogging(affinityGroup = "Individual", enrolments)
         case Some(Organisation) ~ enrolments => createUserDetailsWithLogging(affinityGroup = "Organisation", enrolments)
@@ -49,6 +54,9 @@ class EnrolmentsAuthService @Inject()(val connector: AuthConnector) extends Logg
           Future.successful(Left(LegacyUnauthorisedError))
       }recoverWith unauthorisedError
     } else {
+      logger.info(s" property names are else")
+      allEnrolments.propertyNames.map(logger.info(_))
+      //logger.info(s" property names are ${allEnrolments.propertyNames}")
       authFunction.authorised(predicate).retrieve(affinityGroup and allEnrolments
         and internalId and externalId and agentCode and credentials
         and confidenceLevel and nino and saUtr and name and dateOfBirth
@@ -87,7 +95,7 @@ class EnrolmentsAuthService @Inject()(val connector: AuthConnector) extends Logg
 
   private def createUserDetailsWithLogging(affinityGroup: String,
                                            enrolments: Enrolments,
-                                           identityData: Option[IdentityData] = None): Future[Right[TRError, UserDetails]] = {
+                                           identityData: Option[IdentityData] = None): Future[Right[MtdError, UserDetails]] = {
 
     val clientReference = getClientReferenceFromEnrolments(enrolments)
     //logger.info(s"[AuthorisationService] [authoriseAsClient] Authorisation succeeded as" +
@@ -107,10 +115,11 @@ class EnrolmentsAuthService @Inject()(val connector: AuthConnector) extends Logg
       Future.successful(Right(userDetails.copy(agentReferenceNumber = getAgentReferenceFromEnrolments(enrolments))))
     }
   }
-//TODO Fix me
+//TODO Fix me this was VRN
   def getClientReferenceFromEnrolments(enrolments: Enrolments): Option[String] = enrolments
-    .getEnrolment("HMRC-MTD-VAT")
-    .flatMap(_.getIdentifier("VRN"))
+//    .getEnrolment("HMRC-MTD-VAT")
+    .getEnrolment("IR-SA")
+    .flatMap(_.getIdentifier("NINO"))
     .map(_.value)
 
   def getAgentReferenceFromEnrolments(enrolments: Enrolments): Option[String] = enrolments

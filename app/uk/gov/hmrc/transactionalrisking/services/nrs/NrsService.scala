@@ -16,10 +16,10 @@
 
 package uk.gov.hmrc.transactionalrisking.services.nrs
 
-import com.kenshoo.play.metrics.Metrics
+//import com.kenshoo.play.metrics.Metrics
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.audit.http.connector.AuditResult
+//import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import uk.gov.hmrc.transactionalrisking.controllers.UserRequest
 import uk.gov.hmrc.transactionalrisking.services.nrs.models.request.{Metadata, NotableEventType, NrsSubmission, SearchKeys, SubmitRequest}
 import uk.gov.hmrc.transactionalrisking.services.nrs.models.response.NrsResponse
@@ -77,19 +77,19 @@ class NrsService @Inject()(
 //      }
 //    }
 
-          connector.submit(nrsSubmission).map { response =>
+          connector.submit(nrsSubmission,selfAssessmentSubmission.body.reportId).map { response =>
             response.toOption
           }
 
   }
 
-  def buildNrsSubmission(trReportSubmission: SubmitRequest,
+  def buildNrsSubmission(selfAssessmentSubmission: SubmitRequest,
                          submissionTimestamp: OffsetDateTime,
-                         request: UserRequest[_],notableEventType:NotableEventType): NrsSubmission = {
+                         request: UserRequest[_], notableEventType:NotableEventType): NrsSubmission = {
 
     //TODO fix me later, body will be instance of class NewRdsAssessmentReport
    // val payloadString = Json.toJson(body).toString()
-    val payloadString = Json.toJson(trReportSubmission.body).toString()
+    val payloadString = Json.toJson(selfAssessmentSubmission.body).toString()
     val encodedPayload = hashUtil.encode(payloadString)
     val sha256Checksum = hashUtil.getHash(payloadString)
     val formattedDate = submissionTimestamp.format(DateUtils.isoInstantDatePattern)
@@ -113,7 +113,7 @@ class NrsService @Inject()(
 //            companyName = None,
             nino = "NINO",
             taxPeriodEndDate = LocalDate.now(), //TODO fix me taxPeriodEndDate
-            reportId = trReportSubmission.body.reportId,
+            reportId = selfAssessmentSubmission.body.reportId,
           )
       )
     )

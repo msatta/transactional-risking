@@ -14,8 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.model.domain
+package uk.gov.hmrc.transactionalrisking.models.domain
 
-import java.util.UUID
+import play.api.libs.json.{Format, Json}
+//TODO revisit me later
+object FraudDecision extends Enumeration {
 
-case class CalculationInfo(id: UUID, nino: String, taxYear: String)
+  type FraudRiskDecision = Value
+
+  val Accept: FraudDecision.Value = Value("A")
+  val Check: FraudDecision.Value = Value("C")
+  val Reject: FraudDecision.Value = Value("R")
+
+  implicit val format: Format[FraudRiskDecision] = Json.formatEnum(FraudDecision)
+
+}
+

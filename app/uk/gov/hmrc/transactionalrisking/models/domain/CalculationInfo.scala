@@ -14,25 +14,8 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.model.domain
+package uk.gov.hmrc.transactionalrisking.models.domain
 
-/**
-  * Represents a tax year for DES
-  *
-  * @param value the tax year string (where 2018 represents 2017-18)
-  */
-case class DesTaxYear(value: String) extends AnyVal {
-  override def toString: String = value
-}
+import java.util.UUID
 
-object DesTaxYear {
-
-  /**
-    * @param taxYear tax year in MTD format (e.g. 2017-18)
-    */
-  def fromMtd(taxYear: String): DesTaxYear =
-    DesTaxYear(taxYear.take(2) + taxYear.drop(5))
-
-  def fromDesIntToString(taxYear: Int): String =
-    (taxYear - 1) + "-" + taxYear.toString.drop(2)
-}
+case class CalculationInfo(id: UUID, nino: String, taxYear: String)

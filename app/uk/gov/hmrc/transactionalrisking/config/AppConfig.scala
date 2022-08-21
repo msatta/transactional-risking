@@ -31,7 +31,7 @@ class AppConfig @Inject()(config: ServicesConfig,configuration: Configuration) {
   // NRS config items
   val nrsApiKey: String = config.getString("access-keys.xApiKey")
   private val nrsConfig = configuration.get[Configuration]("microservice.services.non-repudiation")
-  val nrsBaseUrl: String = config.baseUrl("non-repudiation")
+  val nrsBaseUrl: String = config.baseUrl("non-repudiation")+nrsConfig.get[String]("submit-url")
 
   private val rdsConfig = configuration.get[Configuration]("microservice.services.rds")
   val rdsBaseUrlForSubmit:String = config.baseUrl("rds")+rdsConfig.get[String]("submit-url")

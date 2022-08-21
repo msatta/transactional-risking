@@ -14,19 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.model.domain
+package uk.gov.hmrc.transactionalrisking.models.domain
 
-import play.api.libs.json.{Json, Reads}
+sealed trait Origin
 
-object CustomerType extends Enumeration {
-
-  type CustomerType = Value
-
-  val TaxPayer: CustomerType.Value = Value("T")
-  val Agent: CustomerType.Value = Value("A")
-
-  implicit val reads: Reads[CustomerType] =
-    Json.formatEnum(CustomerType)
-
-}
-
+case object External extends Origin
+case object Internal extends Origin

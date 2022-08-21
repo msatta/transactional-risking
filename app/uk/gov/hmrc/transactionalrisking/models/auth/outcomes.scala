@@ -14,18 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.services.auth
+package uk.gov.hmrc.transactionalrisking.models
 
-import play.api.mvc.Request
-import uk.gov.hmrc.transactionalrisking.models.AuthorisationInfo
-import uk.gov.hmrc.transactionalrisking.models.domain.CustomerType
+package object auth {
 
-/**
- * I'd recommend that you look at: https://github.com/hmrc/auth-client
- */
-class AuthService {
-
-  def getAuthorisationInfo(request: Request[_]): AuthorisationInfo =
-    AuthorisationInfo("QQ123456A", CustomerType.TaxPayer, None)
+  type AuthOutcome = Either[MtdError, UserDetails]
 
 }

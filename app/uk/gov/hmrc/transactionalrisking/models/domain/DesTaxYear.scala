@@ -14,10 +14,25 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.model.domain
+package uk.gov.hmrc.transactionalrisking.models.domain
 
-case class Vrn(vrn: String) {
-  override def toString: String = vrn
-  val name = "vrn"
-  def value: String = vrn
+/**
+  * Represents a tax year for DES
+  *
+  * @param value the tax year string (where 2018 represents 2017-18)
+  */
+case class DesTaxYear(value: String) extends AnyVal {
+  override def toString: String = value
+}
+
+object DesTaxYear {
+
+  /**
+    * @param taxYear tax year in MTD format (e.g. 2017-18)
+    */
+  def fromMtd(taxYear: String): DesTaxYear =
+    DesTaxYear(taxYear.take(2) + taxYear.drop(5))
+
+  def fromDesIntToString(taxYear: Int): String =
+    (taxYear - 1) + "-" + taxYear.toString.drop(2)
 }

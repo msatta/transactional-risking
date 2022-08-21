@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.transactionalrisking.services.nrs.models.request
 
-import uk.gov.hmrc.transactionalrisking.model.domain.Vrn
+import uk.gov.hmrc.transactionalrisking.models.domain.Vrn
 //TODO what is VRN?? is this required?
 //case class SubmitRequest(vrn: Vrn, body: SubmitRequestBody)
 case class SubmitRequest(nino: String, body: SubmitRequestBody)
