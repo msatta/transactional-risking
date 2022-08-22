@@ -23,7 +23,7 @@ import play.api.libs.ws.WSClient
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.transactionalrisking.config.AppConfig
 import uk.gov.hmrc.transactionalrisking.controllers.UserRequest
-import uk.gov.hmrc.transactionalrisking.models.domain.{AssessmentReport, AssessmentRequestForSelfAssessment, FraudDecision, FraudRiskReport, FraudRiskRequest, Link, Origin, Risk}
+import uk.gov.hmrc.transactionalrisking.models.domain.{AssessmentReport, AssessmentRequestForSelfAssessment, FraudRiskReport, FraudRiskRequest, Link, Origin, Risk}
 import uk.gov.hmrc.transactionalrisking.services.cip.InsightService
 import uk.gov.hmrc.transactionalrisking.services.nrs.NrsService
 import uk.gov.hmrc.transactionalrisking.services.nrs.models.request.{AssistReportGenerated, SubmitRequest, SubmitRequestBody}
@@ -56,6 +56,8 @@ class TransactionalRiskingService @Inject()(val wsClient: WSClient,
 //    doImplicitAuditing() // TODO: This should be at the controller level.
 //    doExplicitAuditingForGenerationRequest()
     val fraudRiskReport = insightService.assess(generateFraudRiskRequest(request))
+//    val fraudRiskReportStub = accessFraudRiskReport(generateFraudRiskRequest(request))
+
     val rdsAssessmentReportResponse: Future[AssessmentReport] = assess(toNewRdsAssessmentRequestForSelfAssessment(request, fraudRiskReport))
       .map(toAssessmentReport(_,request))
       .map(assessmentReport => {
@@ -97,6 +99,18 @@ class TransactionalRiskingService @Inject()(val wsClient: WSClient,
         case unexpectedStatus => throw new RuntimeException(s"Unexpected status when attempting to get the assessment report from RDS: [$unexpectedStatus]")
       }
     ).map(opt => opt.map(toAssessmentReport))*/
+
+/*  private def accessFraudRiskReport(request: FraudRiskRequest)(implicit ec: ExecutionContext): Future[FraudRiskReport] =
+    wsClient
+      .url(baseUrlForCip)
+      .post(Json.toJson(request))
+      .map(response =>
+        response.status match {
+          //          case Status.OK => response.json.validate[FraudRiskReport].get
+          case Status.OK => response.json.as[FraudRiskReport]
+          case unexpectedStatus => throw new RuntimeException(s"Unexpected status when attempting to get the assessment report from RDS: [$unexpectedStatus]")
+        }
+      )*/
 
   //TODO move this to RDS connector
   private def assess(request: RdsAssessmentRequestForSelfAssessment)(implicit ec: ExecutionContext): Future[NewRdsAssessmentReport] =

@@ -40,7 +40,6 @@ class EnrolmentsAuthService @Inject()(val connector: AuthConnector) extends Logg
 
   def authorised(predicate: Predicate, nrsRequired: Boolean = false)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[AuthOutcome] = {
     if(!nrsRequired){
-      logger.info(s" property names are !nrsRequired")
       logger.info(s" property names are ${allEnrolments.propertyNames}")
       //TODO revisit below as this doesn't look right based on below doc
       //https://confluence.tools.tax.service.gov.uk/display/GG/Predicate+Reference#PredicateReference-EnrolmentwithagentauthorisationbasedonNINO
@@ -54,9 +53,7 @@ class EnrolmentsAuthService @Inject()(val connector: AuthConnector) extends Logg
           Future.successful(Left(LegacyUnauthorisedError))
       }recoverWith unauthorisedError
     } else {
-      logger.info(s" property names are else")
-      allEnrolments.propertyNames.map(logger.info(_))
-      //logger.info(s" property names are ${allEnrolments.propertyNames}")
+      logger.info(s" else part")
       authFunction.authorised(predicate).retrieve(affinityGroup and allEnrolments
         and internalId and externalId and agentCode and credentials
         and confidenceLevel and nino and saUtr and name and dateOfBirth

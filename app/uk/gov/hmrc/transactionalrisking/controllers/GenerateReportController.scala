@@ -43,28 +43,12 @@ import scala.util.Try
  * Currently, the simulator only supports the one context: Self Assessment, as that's all that's expected in 2022.
  *
  */
-class TransactionalRiskingController @Inject()(
+class GenerateReportController @Inject()(
                                                 val cc: ControllerComponents,
                                                 val transactionalRiskingService: TransactionalRiskingService,
                                                 val integrationFrameworkService: IntegrationFrameworkService,
                                                 val authService: EnrolmentsAuthService //TODO may be use EnrolmentsService
                                               )(implicit ec: ExecutionContext) extends AuthorisedController(cc) with BaseController with Logging {
-
-  //  val logger: Logger = Logger("TransactionalRiskingController")
-
-  /*
-  The Client asks TRS to generate a report.
-TRS uses AS to perform the usual implicit auditing.
-TRS uses AS to record explicit event(s) related to this request for generation.
-TRS asks IS for a "fraud risk report".
-IS returns this report to TRS.
-TRS then sends some representation of the original request and original fraud report to RDS.
-RDS returns the assessment to TRS, which is reformatted.
-TRS calls NRS to record this Assessment Requested.
-NRS returns to TRS a Submission ID representing this record.
-TRS uses AS to record explicit event(s) related to this assessment request, including the Submission ID.
-TRS returns a 200 with a JSON representation of the report.
-   */
 
   def generateReportInternal(nino: String, calculationId: String) =
     authorisedAction(nino, nrsRequired = true).async { implicit request =>
@@ -86,7 +70,7 @@ TRS returns a 200 with a JSON representation of the report.
             .map(Json.toJson[AssessmentReport])
             .map(js => Ok(js))
         ).flatten
-      }.getOrElse(Future(BadRequest(asError("Please provide the ID of an Assessment Report."))))
+      }.getOrElse(Future(BadRequest(asError("Please provide valid ID of an Assessment Report."))))
     }
 
   private def deriveCustomerType(request: Request[AnyContent]) = {
