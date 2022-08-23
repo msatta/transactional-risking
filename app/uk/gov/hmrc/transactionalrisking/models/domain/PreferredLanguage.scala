@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.config
+package uk.gov.hmrc.transactionalrisking.models.domain
 
-import akka.actor.{ActorSystem, Scheduler}
-import com.google.inject.{AbstractModule, Provides}
+import play.api.libs.json.{Format, Json}
+import uk.gov.hmrc.transactionalrisking.models.domain
 
-class Module extends AbstractModule {
+object PreferredLanguage extends Enumeration {
 
-  override def configure(): Unit = {
+  type PreferredLanguage = Value
 
-    bind(classOf[AppConfig]).asEagerSingleton()
-  }
+  val English: domain.PreferredLanguage.Value = Value("EN")
+  val Welsh: domain.PreferredLanguage.Value = Value("CY")
 
-  @Provides
-  def akkaScheduler(actorSystem: ActorSystem): Scheduler =
-    actorSystem.scheduler
+  implicit val format: Format[PreferredLanguage] = Json.formatEnum(PreferredLanguage)
+
 }
+

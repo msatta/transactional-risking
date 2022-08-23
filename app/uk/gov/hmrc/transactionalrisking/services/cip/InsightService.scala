@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.config
+package uk.gov.hmrc.transactionalrisking.services.cip
 
-import akka.actor.{ActorSystem, Scheduler}
-import com.google.inject.{AbstractModule, Provides}
+import play.api.Logger
+import uk.gov.hmrc.transactionalrisking.models.domain.{FraudDecision, FraudRiskReport, FraudRiskRequest}
 
-class Module extends AbstractModule {
+class InsightService() {
 
-  override def configure(): Unit = {
+  val logger: Logger = Logger("InsightService")
 
-    bind(classOf[AppConfig]).asEagerSingleton()
+  def assess(fraudRiskRequest: FraudRiskRequest): FraudRiskReport = {
+    logger.info(s"Received request for a fraud risk report ...")
+    val fraudRiskReport = FraudRiskReport(FraudDecision.Accept, 1, Set.empty, Set.empty)
+    logger.info("... returning it.")
+    fraudRiskReport
   }
 
-  @Provides
-  def akkaScheduler(actorSystem: ActorSystem): Scheduler =
-    actorSystem.scheduler
 }
+

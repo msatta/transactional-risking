@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.config
+package uk.gov.hmrc.transactionalriskingsimulator.domain
 
-import akka.actor.{ActorSystem, Scheduler}
-import com.google.inject.{AbstractModule, Provides}
+import play.api.libs.json.{JsPath, Reads, Writes}
 
-class Module extends AbstractModule {
+case class WatchlistFlag(name: String)
 
-  override def configure(): Unit = {
+object WatchlistFlag {
 
-    bind(classOf[AppConfig]).asEagerSingleton()
-  }
+  implicit val reads: Reads[WatchlistFlag] =
+    (JsPath \ "name").read[String].map(WatchlistFlag.apply)
 
-  @Provides
-  def akkaScheduler(actorSystem: ActorSystem): Scheduler =
-    actorSystem.scheduler
+  implicit val writes: Writes[WatchlistFlag] =
+    (JsPath \ "name").write[String].contramap(_.name)
+
 }

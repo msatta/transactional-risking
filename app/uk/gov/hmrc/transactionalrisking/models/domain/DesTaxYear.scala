@@ -14,19 +14,25 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.config
+package uk.gov.hmrc.transactionalrisking.models.domain
 
-import akka.actor.{ActorSystem, Scheduler}
-import com.google.inject.{AbstractModule, Provides}
+/**
+  * Represents a tax year for DES
+  *
+  * @param value the tax year string (where 2018 represents 2017-18)
+  */
+case class DesTaxYear(value: String) extends AnyVal {
+  override def toString: String = value
+}
 
-class Module extends AbstractModule {
+object DesTaxYear {
 
-  override def configure(): Unit = {
+  /**
+    * @param taxYear tax year in MTD format (e.g. 2017-18)
+    */
+  def fromMtd(taxYear: String): DesTaxYear =
+    DesTaxYear(taxYear.take(2) + taxYear.drop(5))
 
-    bind(classOf[AppConfig]).asEagerSingleton()
-  }
-
-  @Provides
-  def akkaScheduler(actorSystem: ActorSystem): Scheduler =
-    actorSystem.scheduler
+  def fromDesIntToString(taxYear: Int): String =
+    (taxYear - 1) + "-" + taxYear.toString.drop(2)
 }

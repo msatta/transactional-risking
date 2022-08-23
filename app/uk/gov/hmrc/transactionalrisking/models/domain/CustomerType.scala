@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.config
+package uk.gov.hmrc.transactionalrisking.models.domain
 
-import akka.actor.{ActorSystem, Scheduler}
-import com.google.inject.{AbstractModule, Provides}
+import play.api.libs.json.{Json, Reads}
 
-class Module extends AbstractModule {
+object CustomerType extends Enumeration {
 
-  override def configure(): Unit = {
+  type CustomerType = Value
 
-    bind(classOf[AppConfig]).asEagerSingleton()
-  }
+  val TaxPayer: CustomerType.Value = Value("T")
+  val Agent: CustomerType.Value = Value("A")
 
-  @Provides
-  def akkaScheduler(actorSystem: ActorSystem): Scheduler =
-    actorSystem.scheduler
+  implicit val reads: Reads[CustomerType] =
+    Json.formatEnum(CustomerType)
+
 }
+

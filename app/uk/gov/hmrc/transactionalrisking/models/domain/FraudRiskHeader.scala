@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.config
+package uk.gov.hmrc.transactionalrisking.models.domain
 
-import akka.actor.{ActorSystem, Scheduler}
-import com.google.inject.{AbstractModule, Provides}
+import play.api.libs.functional.syntax.{toFunctionalBuilderOps, unlift}
+import play.api.libs.json.{JsPath, Reads, Writes}
 
-class Module extends AbstractModule {
+case class FraudRiskHeader(key: String, value: String)
 
-  override def configure(): Unit = {
+object FraudRiskHeader {
 
-    bind(classOf[AppConfig]).asEagerSingleton()
-  }
+  implicit val reads: Reads[FraudRiskHeader] =
+    (JsPath \ "key").read[String]
+      .and((JsPath \ "value").read[String])(FraudRiskHeader.apply _)
 
-  @Provides
-  def akkaScheduler(actorSystem: ActorSystem): Scheduler =
-    actorSystem.scheduler
+  implicit val writes: Writes[FraudRiskHeader] =
+    (JsPath \ "key").write[String]
+      .and((JsPath \ "value").write[String])(unlift(FraudRiskHeader.unapply))
+
 }

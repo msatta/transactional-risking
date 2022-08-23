@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.config
+package uk.gov.hmrc.transactionalrisking.services.auth
 
-import akka.actor.{ActorSystem, Scheduler}
-import com.google.inject.{AbstractModule, Provides}
+import play.api.mvc.Request
+import uk.gov.hmrc.transactionalrisking.models.AuthorisationInfo
+import uk.gov.hmrc.transactionalrisking.models.domain.CustomerType
 
-class Module extends AbstractModule {
+/**
+ * I'd recommend that you look at: https://github.com/hmrc/auth-client
+ */
+class AuthService {
 
-  override def configure(): Unit = {
+  def getAuthorisationInfo(request: Request[_]): AuthorisationInfo =
+    AuthorisationInfo("QQ123456A", CustomerType.TaxPayer, None)
 
-    bind(classOf[AppConfig]).asEagerSingleton()
-  }
-
-  @Provides
-  def akkaScheduler(actorSystem: ActorSystem): Scheduler =
-    actorSystem.scheduler
 }

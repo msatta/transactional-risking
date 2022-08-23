@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.config
+package uk.gov.hmrc.transactionalrisking.models.domain
 
-import akka.actor.{ActorSystem, Scheduler}
-import com.google.inject.{AbstractModule, Provides}
+import play.api.libs.json.{Format, Json}
+//TODO revisit me later
+object FraudDecision extends Enumeration {
 
-class Module extends AbstractModule {
+  type FraudRiskDecision = Value
 
-  override def configure(): Unit = {
+  val Accept: FraudDecision.Value = Value("A")
+  val Check: FraudDecision.Value = Value("C")
+  val Reject: FraudDecision.Value = Value("R")
 
-    bind(classOf[AppConfig]).asEagerSingleton()
-  }
+  implicit val format: Format[FraudRiskDecision] = Json.formatEnum(FraudDecision)
 
-  @Provides
-  def akkaScheduler(actorSystem: ActorSystem): Scheduler =
-    actorSystem.scheduler
 }
+

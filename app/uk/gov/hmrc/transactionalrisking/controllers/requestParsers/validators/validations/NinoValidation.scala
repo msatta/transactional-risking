@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.config
+package uk.gov.hmrc.transactionalrisking.controllers.requestParsers.validators.validations
 
-import akka.actor.{ActorSystem, Scheduler}
-import com.google.inject.{AbstractModule, Provides}
+import uk.gov.hmrc.transactionalrisking.models.{MtdError, NinoFormatError}
+import uk.gov.hmrc.transactionalrisking.models.domain.NinoChecker
 
-class Module extends AbstractModule {
+object NinoValidation {
 
-  override def configure(): Unit = {
+  private val ninoRegex =
+    "^([ACEHJLMOPRSWXY][A-CEGHJ-NPR-TW-Z]|B[A-CEHJ-NPR-TW-Z]|G[ACEGHJ-NPR-TW-Z]|" +
+      "[KT][A-CEGHJ-MPR-TW-Z]|N[A-CEGHJL-NPR-SW-Z]|Z[A-CEGHJ-NPR-TW-Y])[0-9]{6}[A-D ]?$"
 
-    bind(classOf[AppConfig]).asEagerSingleton()
+  def validate(nino: String): List[MtdError] = {
+    if (NinoChecker.isValid(nino) && nino.matches(ninoRegex)) NoValidationErrors else List(NinoFormatError)
   }
 
-  @Provides
-  def akkaScheduler(actorSystem: ActorSystem): Scheduler =
-    actorSystem.scheduler
 }

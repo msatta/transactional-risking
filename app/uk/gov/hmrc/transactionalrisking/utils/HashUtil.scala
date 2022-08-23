@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.config
+package uk.gov.hmrc.transactionalrisking.utils
 
-import akka.actor.{ActorSystem, Scheduler}
-import com.google.inject.{AbstractModule, Provides}
+import java.nio.charset.StandardCharsets
+import java.security.MessageDigest
+import java.util.Base64
+import javax.inject.{Inject, Singleton}
 
-class Module extends AbstractModule {
+@Singleton
+class HashUtil @Inject()() {
 
-  override def configure(): Unit = {
+  private def sha256: MessageDigest = MessageDigest.getInstance("SHA-256")
 
-    bind(classOf[AppConfig]).asEagerSingleton()
-  }
+  def encode(value: String): String = Base64.getEncoder.encodeToString(value.getBytes(StandardCharsets.UTF_8))
+  def getHash(value: String): String = sha256.digest(value.getBytes()).map("%02x" format _).mkString
 
-  @Provides
-  def akkaScheduler(actorSystem: ActorSystem): Scheduler =
-    actorSystem.scheduler
 }
