@@ -24,7 +24,7 @@ class CurrentDateTime @Inject()() {
   def getDateTime: OffsetDateTime = OffsetDateTime.now()
   def dateString(currentDatetime: OffsetDateTime): OffsetDateTime = {
     val formatted = currentDatetime.format(DateUtils.dateTimePattern)
-    val formatter = DateUtils.dateTimePattern.format(OffsetDateTime.parse(currentDatetime.toString))
+//    val formatter = DateUtils.dateTimePattern.format(OffsetDateTime.parse(currentDatetime.toString))
     OffsetDateTime.parse(formatted)
   }
 }
