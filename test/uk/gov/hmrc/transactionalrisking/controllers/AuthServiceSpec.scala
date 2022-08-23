@@ -14,15 +14,8 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.services
-
-import uk.gov.hmrc.transactionalrisking.models.MtdError
-import uk.gov.hmrc.transactionalrisking.services.nrs.models.response.{NrsFailure, NrsResponse}
-
-//import javax.xml.ws.ResponseWrapper
-
-package object nrs {
-  //TODO fix me
-//  type NrsServiceOutcome[Resp] = Either[ErrorWrapper, ResponseWrapper[Resp]]
-  type NrsOutcome = Either[NrsFailure, NrsResponse]
-}
+//package services
+//
+//class AuthServiceSpec extends ServiceSpec {
+//
+//}
