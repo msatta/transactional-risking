@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.config
+package uk.gov.hmrc.transactionalrisking.controllers.requestParsers.validators.validations
 
-import akka.actor.{ActorSystem, Scheduler}
-import com.google.inject.{AbstractModule, Provides}
+import uk.gov.hmrc.transactionalrisking.models.{CalculationIdFormatError, MtdError}
 
-class Module extends AbstractModule {
+object CalculationIdValidation {
+  private val calculationIdRegex = "^[0-9]{8}|[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
 
-  override def configure(): Unit = {
-
-    bind(classOf[AppConfig]).asEagerSingleton()
+  def validate(calculationId: String): List[MtdError] = calculationId match {
+    case _ if calculationId matches calculationIdRegex => NoValidationErrors
+    case _                                             => List(CalculationIdFormatError)
   }
 
-  @Provides
-  def akkaScheduler(actorSystem: ActorSystem): Scheduler =
-    actorSystem.scheduler
 }

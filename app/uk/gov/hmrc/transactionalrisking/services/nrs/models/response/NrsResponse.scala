@@ -14,19 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.config
+package uk.gov.hmrc.transactionalrisking.services.nrs.models.response
 
-import akka.actor.{ActorSystem, Scheduler}
-import com.google.inject.{AbstractModule, Provides}
+import play.api.libs.json.{Json, Reads}
 
-class Module extends AbstractModule {
+case class NrsResponse(reportSubmissionId: String)
 
-  override def configure(): Unit = {
+object NrsResponse {
 
-    bind(classOf[AppConfig]).asEagerSingleton()
-  }
-
-  @Provides
-  def akkaScheduler(actorSystem: ActorSystem): Scheduler =
-    actorSystem.scheduler
+  implicit val reads: Reads[NrsResponse] = Json.reads[NrsResponse]
 }

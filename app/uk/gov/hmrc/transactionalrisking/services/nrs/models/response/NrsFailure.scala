@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.config
+package uk.gov.hmrc.transactionalrisking.services.nrs.models.response
 
-import akka.actor.{ActorSystem, Scheduler}
-import com.google.inject.{AbstractModule, Provides}
+import play.api.http.Status
 
-class Module extends AbstractModule {
+sealed trait NrsFailure {
+  def retryable: Boolean
+}
 
-  override def configure(): Unit = {
-
-    bind(classOf[AppConfig]).asEagerSingleton()
+case object NrsFailure {
+  case class ErrorResponse(status: Int) extends NrsFailure {
+    override def retryable: Boolean = Status.isServerError(status)
   }
-
-  @Provides
-  def akkaScheduler(actorSystem: ActorSystem): Scheduler =
-    actorSystem.scheduler
+  case object ExceptionThrown extends NrsFailure {
+    override def retryable: Boolean = false
+  }
 }

@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.config
+package uk.gov.hmrc.transactionalrisking.utils
 
-import akka.actor.{ActorSystem, Scheduler}
-import com.google.inject.{AbstractModule, Provides}
+import java.time.OffsetDateTime
+import javax.inject.{Inject, Singleton}
 
-class Module extends AbstractModule {
-
-  override def configure(): Unit = {
-
-    bind(classOf[AppConfig]).asEagerSingleton()
+@Singleton
+class CurrentDateTime @Inject()() {
+  def getDateTime: OffsetDateTime = OffsetDateTime.now()
+  def dateString(currentDatetime: OffsetDateTime): OffsetDateTime = {
+    val formatted = currentDatetime.format(DateUtils.dateTimePattern)
+//    val formatter = DateUtils.dateTimePattern.format(OffsetDateTime.parse(currentDatetime.toString))
+    OffsetDateTime.parse(formatted)
   }
-
-  @Provides
-  def akkaScheduler(actorSystem: ActorSystem): Scheduler =
-    actorSystem.scheduler
 }

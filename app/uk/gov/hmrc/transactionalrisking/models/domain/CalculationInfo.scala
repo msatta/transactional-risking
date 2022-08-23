@@ -14,19 +14,8 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.config
+package uk.gov.hmrc.transactionalrisking.models.domain
 
-import akka.actor.{ActorSystem, Scheduler}
-import com.google.inject.{AbstractModule, Provides}
+import java.util.UUID
 
-class Module extends AbstractModule {
-
-  override def configure(): Unit = {
-
-    bind(classOf[AppConfig]).asEagerSingleton()
-  }
-
-  @Provides
-  def akkaScheduler(actorSystem: ActorSystem): Scheduler =
-    actorSystem.scheduler
-}
+case class CalculationInfo(id: UUID, nino: String, taxYear: String)

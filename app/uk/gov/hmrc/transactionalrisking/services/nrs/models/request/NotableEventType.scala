@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.model
+package uk.gov.hmrc.transactionalrisking.services.nrs.models.request
 
-import play.api.libs.json.Json
+sealed trait NotableEventType{
+  def value:String
+}
+object AssistReportGenerated extends NotableEventType{
+  val value ="assist-report-generated"
+}
 
-case class Greeting(message: String)
-
-object Greeting {
-  implicit val format = Json.format[Greeting]
+object AssistReportAcknowledged extends NotableEventType{
+  val value = "assist-report-acknowledged"
 }

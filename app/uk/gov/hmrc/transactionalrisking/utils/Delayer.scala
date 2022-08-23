@@ -14,19 +14,25 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.config
+package uk.gov.hmrc.transactionalrisking.utils
 
-import akka.actor.{ActorSystem, Scheduler}
-import com.google.inject.{AbstractModule, Provides}
+import akka.actor.Scheduler
 
-class Module extends AbstractModule {
+import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future, Promise}
 
-  override def configure(): Unit = {
+//TODO replace this with some other library to add exponential delay
+trait Delayer {
 
-    bind(classOf[AppConfig]).asEagerSingleton()
+  implicit val scheduler: Scheduler
+  implicit val ec: ExecutionContext
+
+  def delay(delay: FiniteDuration): Future[Unit] = {
+    val promise = Promise[Unit]
+
+    scheduler.scheduleOnce(delay)(promise.success(()))
+
+    promise.future
   }
 
-  @Provides
-  def akkaScheduler(actorSystem: ActorSystem): Scheduler =
-    actorSystem.scheduler
 }
