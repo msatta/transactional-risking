@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.transactionalrisking.services
 
-import uk.gov.hmrc.transactionalrisking.models.MtdError
 import uk.gov.hmrc.transactionalrisking.services.nrs.models.response.{NrsFailure, NrsResponse}
 
 //import javax.xml.ws.ResponseWrapper

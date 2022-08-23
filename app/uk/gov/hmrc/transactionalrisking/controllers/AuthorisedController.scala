@@ -25,7 +25,6 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.transactionalrisking.models.{DownstreamError, ForbiddenDownstreamError, LegacyUnauthorisedError, NinoFormatError}
 import uk.gov.hmrc.transactionalrisking.models.auth.UserDetails
 import uk.gov.hmrc.transactionalrisking.models.domain.NinoChecker
-//import uk.gov.hmrc.transactionalrisking.model.domain.Nino
 import uk.gov.hmrc.transactionalrisking.services.EnrolmentsAuthService
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -36,7 +35,6 @@ abstract class AuthorisedController(cc: ControllerComponents)(implicit ec: Execu
 
   val authService: EnrolmentsAuthService
 
-//  def authorisedAction(vrn: String, nrsRequired: Boolean = false): ActionBuilder[UserRequest, AnyContent] = new ActionBuilder[UserRequest, AnyContent] {
   def authorisedAction(nino: String, nrsRequired: Boolean = false): ActionBuilder[UserRequest, AnyContent] = new ActionBuilder[UserRequest, AnyContent] {
 
     override def parser: BodyParser[AnyContent] = cc.parsers.defaultBodyParser
@@ -56,7 +54,6 @@ abstract class AuthorisedController(cc: ControllerComponents)(implicit ec: Execu
       val clientId = request.headers.get("X-Client-Id").getOrElse("N/A")
 
       //TODO check if we need to perform NINO validation here Nino.isValid(nino)
-//      if (VrnValidation.validate(vrn) == Nil) {
       if (NinoChecker.isValid(nino)) {
         authService.authorised(predicate(nino), nrsRequired).flatMap[Result] {
           case Right(userDetails) => block(UserRequest(userDetails.copy(clientId = clientId), request))

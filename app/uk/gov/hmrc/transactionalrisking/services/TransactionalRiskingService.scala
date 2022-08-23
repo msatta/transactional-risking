@@ -116,7 +116,7 @@ class TransactionalRiskingService @Inject()(val wsClient: WSClient,
   private def assess(request: RdsAssessmentRequestForSelfAssessment)(implicit ec: ExecutionContext): Future[NewRdsAssessmentReport] =
     wsClient
 //      .url(baseUrlForRdsAssessments)//TODO RDS check is this for ack
-      .url(baseUrlForRdsAssessmentsSubmit)//TODO RDS check is this for ack
+      .url(baseUrlForRdsAssessmentsSubmit)
       .post(Json.toJson(request))
       .map(response =>
         response.status match {
@@ -128,9 +128,9 @@ class TransactionalRiskingService @Inject()(val wsClient: WSClient,
 //  private def baseUrlForRdsAssessments = s"http://localhost:$port/rds/assessments/sa"
 //  private def baseUrlForRdsAssessments = s"${appConfig.rdsBaseUrlForSubmit}"
   private def baseUrlForRdsAssessmentsSubmit = s"${appConfig.rdsBaseUrlForSubmit}"
-  private def baseUrlForCip = s"${appConfig.cipFraudServiceBaseUrl}"
+//  private def baseUrlForCip = s"${appConfig.cipFraudServiceBaseUrl}"
 
-  private def baseUrlForAcknowledgedRdsAssessments = s"http://localhost:$port/rds/acknowledged_assessments/sa"
+//  private def baseUrlForAcknowledgedRdsAssessments = s"http://localhost:$port/rds/acknowledged_assessments/sa"
 
 
 //  private def acknowledge(request: RdsAcknowledgementRequestForSelfAssessment): Future[Unit] =
@@ -144,7 +144,7 @@ class TransactionalRiskingService @Inject()(val wsClient: WSClient,
 //        }
 //      )
 
-  private def port: String = System.getProperty("http.port", "9000")
+//  private def port: String = System.getProperty("http.port", "9000")
 
 
   private def toAssessmentReport(report: NewRdsAssessmentReport,request:AssessmentRequestForSelfAssessment) = {
