@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package support
+package  uk.gov.hmrc.transactionalrisking.support
 
 import com.typesafe.config.ConfigFactory
 //import uk.gov.hmrc.transactionalrisking.config.FeatureSwitch
