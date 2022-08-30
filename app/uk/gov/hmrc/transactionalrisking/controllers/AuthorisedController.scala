@@ -39,7 +39,7 @@ abstract class AuthorisedController(cc: ControllerComponents)(implicit ec: Execu
 
     override def parser: BodyParser[AnyContent] = cc.parsers.defaultBodyParser
 
-    override protected def executionContext: ExecutionContext = cc.executionContext
+    override protected def executionContext:                                                                                                                                                                                                                                                                       ExecutionContext = cc.executionContext
 
     //TODO fix predicate
     def predicate(nino: String): Predicate =
@@ -56,10 +56,14 @@ abstract class AuthorisedController(cc: ControllerComponents)(implicit ec: Execu
       //TODO check if we need to perform NINO validation here Nino.isValid(nino)
       if (NinoChecker.isValid(nino)) {
         authService.authorised(predicate(nino), nrsRequired).flatMap[Result] {
-          case Right(userDetails) => block(UserRequest(userDetails.copy(clientId = clientId), request))
-          case Left(LegacyUnauthorisedError) => Future.successful(Forbidden(Json.toJson(LegacyUnauthorisedError)))
-          case Left(ForbiddenDownstreamError) => Future.successful(Forbidden(Json.toJson(DownstreamError)))
-          case Left(_) => Future.successful(InternalServerError(Json.toJson(DownstreamError)))
+          case Right(userDetails) =>
+            block(UserRequest(userDetails.copy(clientId = clientId), request))
+          case Left(LegacyUnauthorisedError) =>
+            Future.successful(Forbidden(Json.toJson(LegacyUnauthorisedError)))
+          case Left(ForbiddenDownstreamError) =>
+            Future.successful(Forbidden(Json.toJson(DownstreamError)))
+          case Left(_) =>
+            Future.successful(InternalServerError(Json.toJson(DownstreamError)))
         }
       } else {
         Future.successful(BadRequest(Json.toJson(NinoFormatError)))

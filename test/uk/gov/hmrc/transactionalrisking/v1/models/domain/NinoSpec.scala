@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.transactionalrisking.models.domain
 
-import uk.gov.hmrc.transactionalrisking.support.
+import uk.gov.hmrc.transactionalrisking.support.UnitSpec
 
 class NinoSpec extends UnitSpec{
 

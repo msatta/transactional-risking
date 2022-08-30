@@ -26,7 +26,7 @@ lazy val microservice = Project(appName, file("."))
       //       versions 0.62.2 or below, Java 8 or above, Java 9+ compatible.
       //       while for Versions 0.64.0 or above, Java 11 or above.
       "com.vladsch.flexmark" % "flexmark-profile-pegdown" % "0.62.2" % Test
-    ),
+    )
 
     //
     // NOTE : This is how you would disable the HTML test reporter
