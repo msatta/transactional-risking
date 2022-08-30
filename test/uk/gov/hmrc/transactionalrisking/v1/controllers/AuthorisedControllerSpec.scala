@@ -27,7 +27,7 @@ import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.{Enrolment, Nino}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.transactionalrisking.mocks.services.MockEnrolmentsAuthService
-import uk.gov.hmrc.transactionalrisking.models.{DownstreamError, ForbiddenDownstreamError, LegacyUnauthorisedError, MtdError, NinoFormatError}
+import uk.gov.hmrc.transactionalrisking.models.{ClientOrAgentNotAuthorisedError, DownstreamError, ForbiddenDownstreamError, LegacyUnauthorisedError, MtdError, NinoFormatError}
 import uk.gov.hmrc.transactionalrisking.services.EnrolmentsAuthService
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -113,7 +113,7 @@ class AuthorisedControllerSpec extends ControllerBaseSpec {
 
       val authServiceErrors =
         Seq(
-          (LegacyUnauthorisedError, FORBIDDEN, Json.toJson(LegacyUnauthorisedError)),
+          (ClientOrAgentNotAuthorisedError, FORBIDDEN, Json.toJson(ClientOrAgentNotAuthorisedError)),
           (ForbiddenDownstreamError, FORBIDDEN, Json.toJson(DownstreamError)),
           (unexpectedError, INTERNAL_SERVER_ERROR, Json.toJson(DownstreamError))
         )

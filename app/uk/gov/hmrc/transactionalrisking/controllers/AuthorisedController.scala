@@ -22,7 +22,7 @@ import uk.gov.hmrc.auth.core.{Enrolment, Nino}
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-import uk.gov.hmrc.transactionalrisking.models.{DownstreamError, ForbiddenDownstreamError, LegacyUnauthorisedError, NinoFormatError}
+import uk.gov.hmrc.transactionalrisking.models.{ClientOrAgentNotAuthorisedError, DownstreamError, ForbiddenDownstreamError, LegacyUnauthorisedError, NinoFormatError}
 import uk.gov.hmrc.transactionalrisking.models.auth.UserDetails
 import uk.gov.hmrc.transactionalrisking.models.domain.NinoChecker
 import uk.gov.hmrc.transactionalrisking.services.EnrolmentsAuthService
@@ -41,7 +41,7 @@ abstract class AuthorisedController(cc: ControllerComponents)(implicit ec: Execu
 
     override protected def executionContext:                                                                                                                                                                                                                                                                       ExecutionContext = cc.executionContext
 
-    //TODO fix predicate
+    //TODO fix predicateaaaaaaaaaaaaa
     def predicate(nino: String): Predicate =
      // Enrolment("HMRC-MTD-VAT")
 //      Enrolment("IR-SA").withIdentifier("NINO", nino).withDelegatedAuthRule("mtd-vat-auth") //TODO what is delgated auth rule string?
@@ -58,8 +58,8 @@ abstract class AuthorisedController(cc: ControllerComponents)(implicit ec: Execu
         authService.authorised(predicate(nino), nrsRequired).flatMap[Result] {
           case Right(userDetails) =>
             block(UserRequest(userDetails.copy(clientId = clientId), request))
-          case Left(LegacyUnauthorisedError) =>
-            Future.successful(Forbidden(Json.toJson(LegacyUnauthorisedError)))
+          case Left(ClientOrAgentNotAuthorisedError) =>
+            Future.successful(Forbidden(Json.toJson(ClientOrAgentNotAuthorisedError)))
           case Left(ForbiddenDownstreamError) =>
             Future.successful(Forbidden(Json.toJson(DownstreamError)))
           case Left(_) =>
