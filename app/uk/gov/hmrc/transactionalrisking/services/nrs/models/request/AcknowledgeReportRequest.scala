@@ -14,12 +14,6 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.models
+package uk.gov.hmrc.transactionalrisking.services.nrs.models.request
 
-import uk.gov.hmrc.transactionalrisking.models.errors.MtdError
-
-package object auth {
-
-  type AuthOutcome = Either[MtdError, UserDetails]
-
-}
+case class AcknowledgeReportRequest(nino: String, feedbackId: String)

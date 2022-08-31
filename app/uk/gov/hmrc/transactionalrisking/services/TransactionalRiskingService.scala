@@ -23,14 +23,14 @@ import play.api.libs.ws.WSClient
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.transactionalrisking.config.AppConfig
 import uk.gov.hmrc.transactionalrisking.controllers.UserRequest
+import uk.gov.hmrc.transactionalrisking.services.rds.models.request.RdsRequest.{DataWrapper, MetadataWrapper}
 import uk.gov.hmrc.transactionalrisking.models.domain.{AssessmentReport, AssessmentRequestForSelfAssessment, FraudRiskReport, FraudRiskRequest, Link, Origin, Risk}
 import uk.gov.hmrc.transactionalrisking.services.cip.InsightService
 import uk.gov.hmrc.transactionalrisking.services.nrs.NrsService
-import uk.gov.hmrc.transactionalrisking.services.nrs.models.request.{AssistReportGenerated, SubmitRequest, SubmitRequestBody}
+import uk.gov.hmrc.transactionalrisking.services.nrs.models.request.{AcknowledgeReportRequest, AssistReportGenerated, GenerarteReportRequestBody, GenerateReportRequest}
+import uk.gov.hmrc.transactionalrisking.services.rds.models.request.RdsRequest
 import uk.gov.hmrc.transactionalrisking.services.rds.models.response.NewRdsAssessmentReport
 import uk.gov.hmrc.transactionalrisking.utils.CurrentDateTime
-import uk.gov.hmrc.transactionalriskingsimulator.services.ris.RdsAssessmentRequestForSelfAssessment
-import uk.gov.hmrc.transactionalriskingsimulator.services.ris.RdsAssessmentRequestForSelfAssessment.{DataWrapper, MetadataWrapper}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -46,6 +46,21 @@ class TransactionalRiskingService @Inject()(val wsClient: WSClient,
                                                                                         ) {
 
   val logger: Logger = Logger("TransactionalRiskingService")
+  private def baseUrlForRdsAssessmentsSubmit = s"${appConfig.rdsBaseUrlForSubmit}"
+  private def baseUrlToAcknowledgeRdsAssessments = s"${appConfig.rdsBaseUrlForAcknowledge}"
+
+  //TODO move this to RDS connector
+  private def assess(request: RdsRequest)(implicit ec: ExecutionContext): Future[NewRdsAssessmentReport] =
+    wsClient
+      //      .url(baseUrlForRdsAssessments)//TODO RDS check is this for ack
+      .url(baseUrlForRdsAssessmentsSubmit)
+      .post(Json.toJson(request))
+      .map(response =>
+        response.status match {
+          case Status.OK => response.json.validate[NewRdsAssessmentReport].get
+          case unexpectedStatus => throw new RuntimeException(s"Unexpected status when attempting to get the assessment report from RDS: [$unexpectedStatus]")
+        }
+      )
 
   def assess(request: AssessmentRequestForSelfAssessment,origin: Origin)(implicit hc: HeaderCarrier,
                                                                          ec: ExecutionContext,
@@ -58,7 +73,7 @@ class TransactionalRiskingService @Inject()(val wsClient: WSClient,
     val fraudRiskReport = insightService.assess(generateFraudRiskRequest(request))
 //    val fraudRiskReportStub = accessFraudRiskReport(generateFraudRiskRequest(request))
 
-    val rdsAssessmentReportResponse: Future[AssessmentReport] = assess(toNewRdsAssessmentRequestForSelfAssessment(request, fraudRiskReport))
+    val rdsAssessmentReportResponse: Future[AssessmentReport] = assess(generateRdsAssessmentRequest(request, fraudRiskReport))
       .map(toAssessmentReport(_,request))
       .map(assessmentReport => {
         logger.info("... returning it.")
@@ -69,7 +84,7 @@ class TransactionalRiskingService @Inject()(val wsClient: WSClient,
      rdsAssessmentReportResponse.map{ rdsReport =>
       val submissionTimestamp = currentDateTime.getDateTime
       val nrsId = request.nino //TODO generate nrs id as per the spec
-       val submitRequest = SubmitRequest(nrsId,SubmitRequestBody(rdsReport.toString,request.calculationId.toString) )
+       val submitRequest = GenerateReportRequest(nrsId,GenerarteReportRequestBody(rdsReport.toString,request.calculationId.toString) )
       //Submit asynchronously to NRS //TODO fix me rdsReport.get
       nonRepudiationService.submit(submitRequest, nrsId, submissionTimestamp,AssistReportGenerated)
       rdsReport
@@ -77,16 +92,46 @@ class TransactionalRiskingService @Inject()(val wsClient: WSClient,
 
   }
 
-//  def acknowledge(request: AcknowledgementRequestForSelfAssessment, origin: Origin): Future[Unit] = {
-//    logger.info(s"Received request to acknowledge assessment report for Self Assessment [${request.assessmentId}]")
+  def acknowledge(request: AcknowledgeReportRequest, origin: Origin)(implicit hc: HeaderCarrier,
+                                                                     ec: ExecutionContext,
+                                                                     //  logContext: EndpointLogContext,
+                                                                     userRequest: UserRequest[_],
+                                                                     correlationId:String): Future[NewRdsAssessmentReport] = {
+    logger.info(s"${correlationId} Received request to acknowledge assessment report for Self Assessment [${request.feedbackId}]")
 //    doImplicitAuditing() // TODO: This should be at the controller level.
 //    auditRequestToAcknowledge(request)
-//    acknowledge(RdsAcknowledgementRequestForSelfAssessment(request.assessmentId)).map(_ => {
-//      val submissionId = nonRepudiationService.recordAsAcknowledged(NrsAcknowledgementRequestForSelfAssessment(request.assessmentId))
-//      auditRecordedAcknowledgement(request, submissionId)
-//      logger.info("... returning.")
-//    })
-//  }
+    acknowledgeRds(generateRdsAcknowledgementRequest(request)).map(rdsReport => {
+
+
+        val submissionTimestamp = currentDateTime.getDateTime
+        val nrsId = request.nino //TODO generate nrs id as per the spec
+        val submitRequest = GenerateReportRequest(nrsId,GenerarteReportRequestBody(rdsReport.toString,request.feedbackId.toString) )
+      logger.info(s"... submitting acknowledgement to NRS with body $submitRequest")
+        //Submit asynchronously to NRS //TODO fix me rdsReport.get
+        nonRepudiationService.submit(submitRequest, nrsId, submissionTimestamp,AssistReportGenerated)
+        logger.info("... returning.")
+        rdsReport
+      }
+    )
+
+  }
+
+  private def acknowledgeRds(request: RdsRequest)(implicit hc: HeaderCarrier,
+                                                  ec: ExecutionContext): Future[Unit] =
+    wsClient
+      .url(baseUrlToAcknowledgeRdsAssessments)
+      .post(Json.toJson(request))
+      .map(response =>
+        response.status match {
+          case Status.OK => {logger.info(s"... submitting acknowledgement to RDS success")}
+          //no need to validate as we are interested only in OK response.if validation is required then
+          // we need separate class, as the structure is different
+          //  response.json.validate[NewRdsAssessmentReport].getOrElse(throw new RuntimeException("failed to validate "))}
+          case unexpectedStatus => {
+            logger.error(s"... error during rds acknowledgement ")
+            throw new RuntimeException(s"Unexpected status when attempting to mark the report as acknowledged with RDS: [$unexpectedStatus]")}
+        }
+      )
 
 /*  def find(id: UUID): Future[Option[AssessmentReport]] =
     wsClient
@@ -112,22 +157,11 @@ class TransactionalRiskingService @Inject()(val wsClient: WSClient,
         }
       )*/
 
-  //TODO move this to RDS connector
-  private def assess(request: RdsAssessmentRequestForSelfAssessment)(implicit ec: ExecutionContext): Future[NewRdsAssessmentReport] =
-    wsClient
-//      .url(baseUrlForRdsAssessments)//TODO RDS check is this for ack
-      .url(baseUrlForRdsAssessmentsSubmit)
-      .post(Json.toJson(request))
-      .map(response =>
-        response.status match {
-          case Status.OK => response.json.validate[NewRdsAssessmentReport].get
-          case unexpectedStatus => throw new RuntimeException(s"Unexpected status when attempting to get the assessment report from RDS: [$unexpectedStatus]")
-        }
-      )
+
 
 //  private def baseUrlForRdsAssessments = s"http://localhost:$port/rds/assessments/sa"
 //  private def baseUrlForRdsAssessments = s"${appConfig.rdsBaseUrlForSubmit}"
-  private def baseUrlForRdsAssessmentsSubmit = s"${appConfig.rdsBaseUrlForSubmit}"
+
 //  private def baseUrlForCip = s"${appConfig.cipFraudServiceBaseUrl}"
 
 //  private def baseUrlForAcknowledgedRdsAssessments = s"http://localhost:$port/rds/acknowledged_assessments/sa"
@@ -167,18 +201,18 @@ class TransactionalRiskingService @Inject()(val wsClient: WSClient,
 
   private def toRisk(riskParts: Seq[String]) = Risk(title=riskParts(0), body=riskParts(1), action=riskParts(2), links=Seq(Link(riskParts(3), riskParts(4))),path=riskParts(5))
 
-  private def toNewRdsAssessmentRequestForSelfAssessment(request: AssessmentRequestForSelfAssessment, fraudRiskReport: FraudRiskReport): RdsAssessmentRequestForSelfAssessment
-  = RdsAssessmentRequestForSelfAssessment(
+  private def generateRdsAssessmentRequest(request: AssessmentRequestForSelfAssessment, fraudRiskReport: FraudRiskReport): RdsRequest
+  = RdsRequest(
     Seq(
-      RdsAssessmentRequestForSelfAssessment.InputWithString("calculationId", request.calculationId.toString),
-      RdsAssessmentRequestForSelfAssessment.InputWithString("nino", request.nino),
-      RdsAssessmentRequestForSelfAssessment.InputWithString("taxYear", request.taxYear),
-      RdsAssessmentRequestForSelfAssessment.InputWithString("customerType", request.customerType.toString),
-      RdsAssessmentRequestForSelfAssessment.InputWithString("agentRef", request.agentRef.getOrElse("")),
-      RdsAssessmentRequestForSelfAssessment.InputWithString("preferredLanguage", request.preferredLanguage.toString),
-      RdsAssessmentRequestForSelfAssessment.InputWithString("fraudRiskReportDecision", fraudRiskReport.decision.toString),
-      RdsAssessmentRequestForSelfAssessment.InputWithInt("fraudRiskReportScore", fraudRiskReport.score),
-      RdsAssessmentRequestForSelfAssessment.InputWithObject("fraudRiskReportHeaders",
+      RdsRequest.InputWithString("calculationId", request.calculationId.toString),
+      RdsRequest.InputWithString("nino", request.nino),
+      RdsRequest.InputWithString("taxYear", request.taxYear),
+      RdsRequest.InputWithString("customerType", request.customerType.toString),
+      RdsRequest.InputWithString("agentRef", request.agentRef.getOrElse("")),
+      RdsRequest.InputWithString("preferredLanguage", request.preferredLanguage.toString),
+      RdsRequest.InputWithString("fraudRiskReportDecision", fraudRiskReport.decision.toString),
+      RdsRequest.InputWithInt("fraudRiskReportScore", fraudRiskReport.score),
+      RdsRequest.InputWithObject("fraudRiskReportHeaders",
         Seq(
           MetadataWrapper(
             Seq(
@@ -188,7 +222,7 @@ class TransactionalRiskingService @Inject()(val wsClient: WSClient,
           DataWrapper(fraudRiskReport.headers.map(header => Seq(header.key, header.value)).toSeq)
         )
       ),
-      RdsAssessmentRequestForSelfAssessment.InputWithObject("fraudRiskReportWatchlistFlags",
+      RdsRequest.InputWithObject("fraudRiskReportWatchlistFlags",
         Seq(
           MetadataWrapper(
             Seq(
@@ -197,6 +231,14 @@ class TransactionalRiskingService @Inject()(val wsClient: WSClient,
           DataWrapper(fraudRiskReport.watchlistFlags.map(flag => Seq(flag.name)).toSeq)
         )
       )
+    )
+  )
+
+  private def generateRdsAcknowledgementRequest(request: AcknowledgeReportRequest): RdsRequest
+  = RdsRequest(
+    Seq(
+      RdsRequest.InputWithString("feedbackId", request.feedbackId),
+      RdsRequest.InputWithString("nino", request.nino)
     )
   )
 

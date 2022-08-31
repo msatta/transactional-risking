@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalriskingsimulator.services.ris
+package uk.gov.hmrc.transactionalrisking.services.rds.models.request
 
 import play.api.libs.functional.syntax.{toFunctionalBuilderOps, unlift}
 import play.api.libs.json._
-import uk.gov.hmrc.transactionalriskingsimulator.services.ris.RdsAssessmentRequestForSelfAssessment.Input
+import uk.gov.hmrc.transactionalrisking.services.rds.models.request.RdsRequest.Input
 
 import java.util.UUID
 
-case class RdsAssessmentRequestForSelfAssessment(inputs: Seq[Input]) {
+case class RdsRequest(inputs: Seq[Input]) {
 
   def calculationId: UUID =
     inputs.find(_.name == "calculationId").map(_.value.toString).map(UUID.fromString)
@@ -30,7 +30,7 @@ case class RdsAssessmentRequestForSelfAssessment(inputs: Seq[Input]) {
 
 }
 
-object RdsAssessmentRequestForSelfAssessment {
+object RdsRequest {
 
   trait Input {
     def name: String
@@ -45,6 +45,7 @@ object RdsAssessmentRequestForSelfAssessment {
           case Some(JsNull) => InputWithString.reads.reads(json)
           case Some(JsNumber(_)) => InputWithInt.reads.reads(json)
           case Some(JsArray(_)) => InputWithObject.reads.reads(json)
+          case Some(JsBoolean(_)) => InputWithBoolean.reads.reads(json)
         }
     }
 
@@ -98,6 +99,20 @@ object RdsAssessmentRequestForSelfAssessment {
 
   }
 
+  case class InputWithBoolean(name: String, value: Boolean) extends Input
+
+  object InputWithBoolean {
+
+    val reads: Reads[InputWithBoolean] =
+      (JsPath \ "name").read[String]
+        .and((JsPath \ "value").readWithDefault[Boolean](false))(InputWithBoolean.apply _)
+
+    val writes: Writes[InputWithBoolean] =
+      (JsPath \ "name").write[String]
+        .and((JsPath \ "value").write[Boolean])(unlift(InputWithBoolean.unapply))
+
+  }
+
   trait ObjectPart
 
   object ObjectPart {
@@ -142,10 +157,10 @@ object RdsAssessmentRequestForSelfAssessment {
 
   }
 
-  implicit val reads: Reads[RdsAssessmentRequestForSelfAssessment] =
-    (JsPath \ "inputs").read[Seq[Input]].map(RdsAssessmentRequestForSelfAssessment.apply)
+  implicit val reads: Reads[RdsRequest] =
+    (JsPath \ "inputs").read[Seq[Input]].map(RdsRequest.apply)
 
-  implicit val writes: Writes[RdsAssessmentRequestForSelfAssessment] =
+  implicit val writes: Writes[RdsRequest] =
     (JsPath \ "inputs").write[Seq[Input]].contramap(_.inputs)
 
 }

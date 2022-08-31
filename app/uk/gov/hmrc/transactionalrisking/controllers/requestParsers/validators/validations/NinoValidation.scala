@@ -16,8 +16,8 @@
 
 package uk.gov.hmrc.transactionalrisking.controllers.requestParsers.validators.validations
 
-import uk.gov.hmrc.transactionalrisking.models.{MtdError, NinoFormatError}
 import uk.gov.hmrc.transactionalrisking.models.domain.NinoChecker
+import uk.gov.hmrc.transactionalrisking.models.errors.{MtdError, NinoFormatError}
 
 object NinoValidation {
 

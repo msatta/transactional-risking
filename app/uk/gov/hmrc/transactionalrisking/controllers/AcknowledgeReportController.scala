@@ -18,16 +18,19 @@ package uk.gov.hmrc.transactionalrisking.controllers
 
 import play.api.libs.json._
 import play.api.mvc._
-import uk.gov.hmrc.transactionalrisking.models.domain._
+import uk.gov.hmrc.transactionalrisking.controllers.requestParsers.AcknowledgeRequestParser
+import uk.gov.hmrc.transactionalrisking.models.domain.Internal
+import uk.gov.hmrc.transactionalrisking.models.request.AcknowledgeReportRawData
 import uk.gov.hmrc.transactionalrisking.services.eis.IntegrationFrameworkService
+import uk.gov.hmrc.transactionalrisking.services.nrs.models.request.AcknowledgeReportRequest
 import uk.gov.hmrc.transactionalrisking.services.{EnrolmentsAuthService, TransactionalRiskingService}
 import uk.gov.hmrc.transactionalrisking.utils.Logging
+import uk.gov.hmrc.transactionalrisking.models.errors.ErrorWrapper
+import uk.gov.hmrc.transactionalrisking.services.rds.models.response.NewRdsAssessmentReport
 
 import java.util.UUID
 import javax.inject.Inject
-//import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Try
 
 /**
  * This Controller represents the Transactional Risk Service which is called from two origins: externally (Third Party Software via
@@ -43,69 +46,47 @@ import scala.util.Try
  * Currently, the simulator only supports the one context: Self Assessment, as that's all that's expected in 2022.
  *
  */
-class GenerateReportController @Inject()(
-                                                val cc: ControllerComponents,
-                                                val transactionalRiskingService: TransactionalRiskingService,
-                                                val integrationFrameworkService: IntegrationFrameworkService,
-                                                val authService: EnrolmentsAuthService //TODO may be use EnrolmentsService
+class AcknowledgeReportController @Inject()(
+                                             val cc: ControllerComponents,
+                                             requestParser: AcknowledgeRequestParser,
+                                             val transactionalRiskingService: TransactionalRiskingService,
+                                             val integrationFrameworkService: IntegrationFrameworkService,
+                                             val authService: EnrolmentsAuthService //TODO may be use EnrolmentsService
                                               )(implicit ec: ExecutionContext) extends AuthorisedController(cc) with BaseController with Logging {
-
-  def generateReportInternal(nino: String, calculationId: String) =
-    authorisedAction(nino, nrsRequired = true).async { implicit request =>
+    //TODO revisit if reportId needs to be UUID instead of string? as regex validation is done anyway
+    def acknowledgeReportForSelfAssessment(nino: String, reportId: String): Action[AnyContent] =
+      authorisedAction(nino, nrsRequired = true).async {implicit request => {
       implicit val correlationId: String = UUID.randomUUID().toString
-      // val report = Future(Ok("Report"))
-      val customerType = deriveCustomerType(request)
-      toId(calculationId).map { calculationIdUuid =>
-        val calculationInfo = getCalculationInfo(calculationIdUuid, nino)
-        //val report = connector.generateReport(nino, calculationId).map(g => Ok(g.message))
-        val assessmentRequestForSelfAssessment = new AssessmentRequestForSelfAssessment(calculationIdUuid,
-          nino,
-          PreferredLanguage.English,
-          customerType,
-          None,
-          calculationInfo.taxYear)
-//TODO revisit do we need to bother about internal / external?
-        Future(
-          transactionalRiskingService.assess(assessmentRequestForSelfAssessment, Internal)
-            .map(Json.toJson[AssessmentReport])
-            .map(js => Ok(js))
-        ).flatten
-      }.getOrElse(Future(BadRequest(asError("Please provide valid ID of an Assessment Report."))))
+      logger.info(s"Received request to acknowledge assessment report: [$reportId]")
+
+
+        val parsedRequest: Either[ErrorWrapper, AcknowledgeReportRequest] = requestParser.parseRequest(AcknowledgeReportRawData(nino, reportId))
+        val response: Either[ErrorWrapper, Future[NewRdsAssessmentReport]] = parsedRequest.map(req => transactionalRiskingService.acknowledge(req,Internal))
+        response match {
+          case Right(value) => {
+            value.map(r=> logger.info(s"RDS success response $r"))
+
+            Future(NoContent)
+          }
+          case Left(value) => Future(BadRequest(Json.toJson(value)))
+        }
+//        serviceResponse <- {
+//
+//          //Submit Return to ETMP
+//          EitherT(service.submitReturn(parsedRequest.copy(body =
+//            parsedRequest.body.copy(receivedAt =
+//              Some(submissionTimestamp.format(DateUtils.dateTimePattern)), agentReference = arn))))
+//          //Submit asynchronously to NRS
+//          nrsService.submit(parsedRequest, nrsId, submissionTimestamp)
+
+
+
+//      toId(rawId)
+//        .map(id => transactionalRiskingService.acknowledge(AcknowledgementRequestForSelfAssessment(id), origin).map(_ => NoContent))
+//        .getOrElse(Future(BadRequest(asError("Please provide the ID of an Assessment Report."))))
+      //Future(BadRequest(asError("Development in progress.")))
     }
-
-  private def deriveCustomerType(request: Request[AnyContent]) = {
-    //TODO fix me, write logic to derive customer type
-    CustomerType.TaxPayer
-  }
-
-
-
-  //  def internalGenerateAssessmentForSelfAssessment: Action[JsValue] = {
-  //    Action.async(parse.json) { request: Request[JsValue] => {
-  //      request.body.validate[AssessmentRequestForSelfAssessment].fold(
-  //        errors => {
-  //          Future(BadRequest(asError(errors)))
-  //        },
-  //        assessmentRequestForSelfAssessment => {
-  //          transactionalRiskingService.assess(assessmentRequestForSelfAssessment, Internal).map(Json.toJson[AssessmentReport]).map(js => Ok(js))
-  //        }
-  //      )
-  //    }
-  //    }
-  //  }
-
-  //  def internalAcknowledgeAssessmentForSelfAssessment(rawId: String): Action[AnyContent] = acknowledgeAssessmentForSelfAssessment(rawId, Internal)
-  //
-  //  def acknowledgeAssessmentForSelfAssessment(rawId: String, origin: Origin): Action[AnyContent] = Action.async { _ => {
-  //    logger.info(s"Received request to acknowledge assessment report: [$rawId]")
-  //    toId(rawId)
-  //      .map(id => transactionalRiskingService.acknowledge(AcknowledgementRequestForSelfAssessment(id), origin).map(_ => NoContent))
-  //      .getOrElse(Future(BadRequest(asError("Please provide the ID of an Assessment Report."))))
-  //  }
-  //  }
-
-  private def toId(rawId: String): Option[UUID] =
-    Try(UUID.fromString(rawId)).toOption
+    }
 
   private def asError(message: String): JsObject = Json.obj("message" -> message)
   //
@@ -132,9 +113,6 @@ class GenerateReportController @Inject()(
   //
   //  }
 
-  private def getCalculationInfo(id: UUID, nino: String): CalculationInfo =
-    integrationFrameworkService.getCalculationInfo(id, nino)
-      .getOrElse(throw new RuntimeException(s"Unknown calculation for id [$id] and nino [$nino]"))
 
   //  private def getAuthorisationInfo(request: Request[_]): AuthorisationInfo =
   //    authService.getAuthorisationInfo(request)
