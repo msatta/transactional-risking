@@ -26,9 +26,9 @@ import play.api.mvc._
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.{Enrolment, Nino}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.transactionalrisking.mocks.services.MockEnrolmentsAuthService
 import uk.gov.hmrc.transactionalrisking.models.{ClientOrAgentNotAuthorisedError, DownstreamError, ForbiddenDownstreamError, LegacyUnauthorisedError, MtdError, NinoFormatError}
 import uk.gov.hmrc.transactionalrisking.services.EnrolmentsAuthService
+import uk.gov.hmrc.transactionalrisking.v1.mocks.services.MockEnrolmentsAuthService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Await, Future}

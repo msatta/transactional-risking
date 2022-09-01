@@ -34,8 +34,9 @@ import uk.gov.hmrc.transactionalriskingsimulator.services.ris.RdsAssessmentReque
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.{Inject, Singleton}
 
-
+@Singleton
 class TransactionalRiskingService @Inject()(val wsClient: WSClient,
                                             nonRepudiationService: NrsService,
                                             appConfig: AppConfig,

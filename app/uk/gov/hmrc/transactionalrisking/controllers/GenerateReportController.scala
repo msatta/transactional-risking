@@ -38,7 +38,7 @@ import scala.util.Try
  * Also, there will be potentially multiple "contexts" to support; we will start with Self Assessment (SA) but we're expected
  * to eventually add supports for VAT; note that a future context may not be related to a tax regime at all - it could be some sort of other registration, for example.
  *
- * It is fully expected that the request payloads will differ according to the context; however, the response payloads will likely be the same.
+ * It is fully expected that the request payloads wiall differ according to the context; however, the response payloads will likely be the same.
  *
  * Currently, the simulator only supports the one context: Self Assessment, as that's all that's expected in 2022.
  *
