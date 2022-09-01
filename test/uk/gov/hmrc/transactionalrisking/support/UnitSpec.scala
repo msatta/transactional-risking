@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-package  uk.gov.hmrc.transactionalrisking.support
-
-import com.typesafe.config.ConfigFactory
+package uk.gov.hmrc.transactionalrisking.support
 //import uk.gov.hmrc.transactionalrisking.config.FeatureSwitch
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.EitherValues
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import play.api.Configuration
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
 
 trait UnitSpec extends AnyWordSpecLike
@@ -34,6 +31,7 @@ trait UnitSpec extends AnyWordSpecLike
 
 
   //lifted from hmrctest UnitSpec.  Should find a way to use their UnitSpec in future iterations
+
   import scala.concurrent.duration._
   import scala.concurrent.{Await, Future}
 
@@ -46,6 +44,6 @@ trait UnitSpec extends AnyWordSpecLike
   // Convenience to avoid having to wrap andThen() parameters in Future.successful
   implicit def liftFuture[A](v: A): Future[A] = Future.successful(v)
 
-//  def createFeatureSwitch(config: String): FeatureSwitch =
-//    FeatureSwitch(Some(Configuration(ConfigFactory.parseString(config))))
+  //  def createFeatureSwitch(config: String): FeatureSwitch =
+  //    FeatureSwitch(Some(Configuration(ConfigFactory.parseString(config))))
 }
