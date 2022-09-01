@@ -24,7 +24,7 @@ import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.{Enrolment, Nino}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.transactionalrisking.mocks.services.MockEnrolmentsAuthService
-import uk.gov.hmrc.transactionalrisking.models._
+import uk.gov.hmrc.transactionalrisking.models.errors._
 import uk.gov.hmrc.transactionalrisking.services.EnrolmentsAuthService
 
 import scala.concurrent.ExecutionContext.Implicits.global

@@ -25,7 +25,8 @@ package uk.gov.hmrc.transactionalrisking.models.request
 //  def backendCalculationUri: String = s"/${nino.nino}/self-assessment/$calculationId"
 //}
 
-case class GetCalculationRawData(nino: String, calculationId: String) extends RawData
+case class GenerateReportRawData(nino: String, calculationId: String) extends RawData
+case class AcknowledgeReportRawData(nino: String, reportId: String) extends RawData
 
 //case class GetCalculationRequest(nino: Nino, calculationId: String) extends CommonCalculationRequest
 //

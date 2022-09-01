@@ -16,25 +16,20 @@
 
 package uk.gov.hmrc.transactionalrisking.controllers.requestParsers.validators
 
+import uk.gov.hmrc.transactionalrisking.controllers.requestParsers.validators.validations.{NinoValidation, ReportIDValidation}
 import uk.gov.hmrc.transactionalrisking.models.errors.MtdError
-import uk.gov.hmrc.transactionalrisking.models.request.RawData
+import uk.gov.hmrc.transactionalrisking.models.request.AcknowledgeReportRawData
 
-trait Validator[A <: RawData] {
+class AcknowledgeReportValidator extends Validator[AcknowledgeReportRawData] {
 
-  type ValidationLevel[T] = T => List[MtdError]
+  private val validationSet = List(parameterFormatValidation)
 
-  def validate(data: A): List[MtdError]
+  private def parameterFormatValidation: AcknowledgeReportRawData => List[List[MtdError]] = { data =>
+    List(NinoValidation.validate(data.nino), ReportIDValidation.validate(data.reportId))
+  }
 
-  def run(validationSet: List[A => List[List[MtdError]]], data: A): List[MtdError] = {
-
-    validationSet match {
-      case Nil => List()
-      case thisLevel :: remainingLevels =>
-        thisLevel(data).flatten match {
-          case x if x.isEmpty  => run(remainingLevels, data)
-          case x if x.nonEmpty => x
-        }
-    }
+  override def validate(data: AcknowledgeReportRawData): List[MtdError] = {
+    run(validationSet, data).distinct
   }
 
 }

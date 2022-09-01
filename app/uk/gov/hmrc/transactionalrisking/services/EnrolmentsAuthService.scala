@@ -24,7 +24,8 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals._
 import uk.gov.hmrc.auth.core.retrieve.{ItmpAddress, ItmpName, ~}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.transactionalrisking.models.auth.{AuthOutcome, UserDetails}
-import uk.gov.hmrc.transactionalrisking.models.{DownstreamError, ForbiddenDownstreamError, LegacyUnauthorisedError, MtdError}
+import uk.gov.hmrc.transactionalrisking.models.errors.ForbiddenDownstreamError
+import uk.gov.hmrc.transactionalrisking.models.errors.{DownstreamError, ForbiddenDownstreamError, LegacyUnauthorisedError, MtdError}
 import uk.gov.hmrc.transactionalrisking.services.nrs.models.request.IdentityData
 import uk.gov.hmrc.transactionalrisking.utils.Logging
 

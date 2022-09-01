@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.models
+package uk.gov.hmrc.transactionalrisking.services.nrs.models.request
 
-import uk.gov.hmrc.transactionalrisking.models.errors.MtdError
+import play.api.libs.json.Json
 
-package object auth {
-
-  type AuthOutcome = Either[MtdError, UserDetails]
-
+//TODO newRdsAssessmentReport will be populated using NewRdsAssessmentReport class, as of now String
+//TODO should this be called NRSRequestBody? is this left NRS specific?
+case class GenerarteReportRequestBody(newRdsAssessmentReport:String, reportId:String)
+object GenerarteReportRequestBody{
+  implicit val formatter = Json.format[GenerarteReportRequestBody]
 }
