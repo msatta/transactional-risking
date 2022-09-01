@@ -17,18 +17,18 @@
 package uk.gov.hmrc.transactionalrisking.controllers.requestParsers.validators
 
 import uk.gov.hmrc.transactionalrisking.controllers.requestParsers.validators.validations.{CalculationIdValidation, NinoValidation}
-import uk.gov.hmrc.transactionalrisking.models.MtdError
-import uk.gov.hmrc.transactionalrisking.models.request.GetCalculationRawData
+import uk.gov.hmrc.transactionalrisking.models.errors.MtdError
+import uk.gov.hmrc.transactionalrisking.models.request.GenerateReportRawData
 
-class GetCalculationValidator extends Validator[GetCalculationRawData] {
+class GenerateReportValidator extends Validator[GenerateReportRawData] {
 
   private val validationSet = List(parameterFormatValidation)
 
-  private def parameterFormatValidation: GetCalculationRawData => List[List[MtdError]] = { data =>
+  private def parameterFormatValidation: GenerateReportRawData => List[List[MtdError]] = { data =>
     List(NinoValidation.validate(data.nino), CalculationIdValidation.validate(data.calculationId))
   }
 
-  override def validate(data: GetCalculationRawData): List[MtdError] = {
+  override def validate(data: GenerateReportRawData): List[MtdError] = {
     run(validationSet, data).distinct
   }
 

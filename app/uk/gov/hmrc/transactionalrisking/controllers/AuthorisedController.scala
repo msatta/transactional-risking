@@ -24,7 +24,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.transactionalrisking.models.auth.UserDetails
 import uk.gov.hmrc.transactionalrisking.models.domain.NinoChecker
-import uk.gov.hmrc.transactionalrisking.models.{ClientOrAgentNotAuthorisedError, DownstreamError, ForbiddenDownstreamError, NinoFormatError}
+import uk.gov.hmrc.transactionalrisking.models.errors.{ClientOrAgentNotAuthorisedError, DownstreamError, ForbiddenDownstreamError, NinoFormatError}
 import uk.gov.hmrc.transactionalrisking.services.EnrolmentsAuthService
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -41,10 +41,8 @@ abstract class AuthorisedController(cc: ControllerComponents)(implicit ec: Execu
 
     override protected def executionContext: ExecutionContext = cc.executionContext
 
-    //TODO fix predicateaaaaaaaaaaaaa
+    //TODO fix predicate
     def predicate(nino: String): Predicate =
-    // Enrolment("HMRC-MTD-VAT")
-    //      Enrolment("IR-SA").withIdentifier("NINO", nino).withDelegatedAuthRule("mtd-vat-auth") //TODO what is delgated auth rule string?
       Nino(hasNino = true, nino = Some(nino)) or Enrolment("IR-SA").withIdentifier("Nino", nino).withDelegatedAuthRule("afi-auth")
 
     override def invokeBlock[A](request: Request[A], block: UserRequest[A] => Future[Result]): Future[Result] = {

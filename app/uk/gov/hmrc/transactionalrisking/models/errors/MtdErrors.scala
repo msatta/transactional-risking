@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.models
+package uk.gov.hmrc.transactionalrisking.models.errors
 
-import play.api.libs.json.{JsObject, JsValue, Json, OWrites, Reads, Writes}
+import play.api.libs.json._
 
 //TODO Revisit below error scenarios
 /*
@@ -51,19 +51,21 @@ object MtdError {
   implicit val reads: Reads[MtdError] = Json.reads[MtdError]
 }
 
-case class TRErrorWrapper(code: String, message: String, path: Option[String], errors: Option[Seq[TRErrorWrapper]] = None)
+case class MtdErrorWrapper(code: String, message: String, path: Option[String], errors: Option[Seq[MtdErrorWrapper]] = None)
 
-object TRErrorWrapper {
-  implicit val writes: OWrites[TRErrorWrapper] = Json.writes[TRErrorWrapper]
+object MtdErrorWrapper {
+  implicit val writes: OWrites[MtdErrorWrapper] = Json.writes[MtdErrorWrapper]
 
-  implicit def genericWrites[T <: TRErrorWrapper]: OWrites[T] =
-    writes.contramap[T](c => c: TRErrorWrapper)
+  implicit def genericWrites[T <: MtdErrorWrapper]: OWrites[T] =
+    writes.contramap[T](c => c: MtdErrorWrapper)
 
-  implicit val reads: Reads[TRErrorWrapper] = Json.reads[TRErrorWrapper]
+  implicit val reads: Reads[MtdErrorWrapper] = Json.reads[MtdErrorWrapper]
 }
 
 //NRS error
 object NrsError extends MtdError("NRS_SUBMISSION_FAILURE", "The submission to NRS from MDTP failed")
+
+object ReportIdFormatError extends MtdError("REPORT_ID_INVALID", "The provided REPORT_ID format is invalid")
 
 // Format Errors
 object NinoFormatError extends MtdError("FORMAT_NINO", "The provided NINO is invalid")

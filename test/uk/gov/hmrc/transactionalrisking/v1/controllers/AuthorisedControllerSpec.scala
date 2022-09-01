@@ -17,16 +17,14 @@
 package uk.gov.hmrc.transactionalrisking.controllers
 
 import akka.util.ByteString
-import jdk.nashorn.api.scripting.JSObject
-import play.api.Play.materializer
 import play.api.http.HttpEntity
-import play.api.http.MediaRange.parse
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.{Enrolment, Nino}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.transactionalrisking.models.{ClientOrAgentNotAuthorisedError, DownstreamError, ForbiddenDownstreamError, LegacyUnauthorisedError, MtdError, NinoFormatError}
+import uk.gov.hmrc.transactionalrisking.v1.mocks.services.MockEnrolmentsAuthService
+import uk.gov.hmrc.transactionalrisking.models.errors._
 import uk.gov.hmrc.transactionalrisking.services.EnrolmentsAuthService
 import uk.gov.hmrc.transactionalrisking.v1.mocks.services.MockEnrolmentsAuthService
 
@@ -43,14 +41,14 @@ class AuthorisedControllerSpec extends ControllerBaseSpec {
     class TestController extends AuthorisedController(cc) {
       override val authService: EnrolmentsAuthService = mockEnrolmentsAuthService
 
-      def authorisedActionAysncSUT(nino: String, nrsRequired:Boolean=true): Action[AnyContent] = authorisedAction(nino, nrsRequired ).async {
+      def authorisedActionAysncSUT(nino: String, nrsRequired: Boolean = true): Action[AnyContent] = authorisedAction(nino, nrsRequired).async {
         Future.successful(Ok(Json.obj()))
       }
     }
   }
 
   val ninoIsCorrect: String = "AA000000B"
-  val ninoIsIncorrect: String   = "AA000000Z"
+  val ninoIsIncorrect: String = "AA000000Z"
 
   "calling an action" when {
 

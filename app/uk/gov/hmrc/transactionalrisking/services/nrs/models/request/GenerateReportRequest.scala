@@ -16,11 +16,4 @@
 
 package uk.gov.hmrc.transactionalrisking.services.nrs.models.request
 
-import play.api.libs.json.Json
-
-//TODO newRdsAssessmentReport will be populated using NewRdsAssessmentReport class, as of now String
-
-case class SubmitRequestBody(newRdsAssessmentReport:String,reportId:String)
-object SubmitRequestBody{
-  implicit val formatter = Json.format[SubmitRequestBody]
-}
+case class GenerateReportRequest(nino: String, body: GenerarteReportRequestBody)

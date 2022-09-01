@@ -64,7 +64,7 @@ class GenerateReportController @Inject()(
           customerType,
           None,
           calculationInfo.taxYear)
-
+//TODO revisit do we need to bother about internal / external?
         Future(
           transactionalRiskingService.assess(assessmentRequestForSelfAssessment, Internal)
             .map(Json.toJson[AssessmentReport])
