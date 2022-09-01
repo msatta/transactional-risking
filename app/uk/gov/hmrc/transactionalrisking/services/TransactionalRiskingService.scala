@@ -29,7 +29,7 @@ import uk.gov.hmrc.transactionalrisking.services.cip.InsightService
 import uk.gov.hmrc.transactionalrisking.services.nrs.NrsService
 import uk.gov.hmrc.transactionalrisking.services.nrs.models.request.{AcknowledgeReportRequest, AssistReportGenerated, GenerarteReportRequestBody, GenerateReportRequest}
 import uk.gov.hmrc.transactionalrisking.services.rds.models.request.RdsRequest
-import uk.gov.hmrc.transactionalrisking.services.rds.models.response.NewRdsAssessmentReport
+import uk.gov.hmrc.transactionalrisking.services.rds.models.response.{NewRdsAssessmentReport, RdsAcknowledgementResponse}
 import uk.gov.hmrc.transactionalrisking.utils.CurrentDateTime
 
 import javax.inject.Inject
@@ -96,13 +96,13 @@ class TransactionalRiskingService @Inject()(val wsClient: WSClient,
                                                                      ec: ExecutionContext,
                                                                      //  logContext: EndpointLogContext,
                                                                      userRequest: UserRequest[_],
-                                                                     correlationId:String): Future[NewRdsAssessmentReport] = {
+                                                                     correlationId:String): Future[RdsAcknowledgementResponse] = {
     logger.info(s"${correlationId} Received request to acknowledge assessment report for Self Assessment [${request.feedbackId}]")
 //    doImplicitAuditing() // TODO: This should be at the controller level.
 //    auditRequestToAcknowledge(request)
     acknowledgeRds(generateRdsAcknowledgementRequest(request)).map(rdsReport => {
 
-
+logger.info(s"rds ack response is ${rdsReport.toString}")
         val submissionTimestamp = currentDateTime.getDateTime
         val nrsId = request.nino //TODO generate nrs id as per the spec
         val submitRequest = GenerateReportRequest(nrsId,GenerarteReportRequestBody(rdsReport.toString,request.feedbackId.toString) )
@@ -117,16 +117,16 @@ class TransactionalRiskingService @Inject()(val wsClient: WSClient,
   }
 
   private def acknowledgeRds(request: RdsRequest)(implicit hc: HeaderCarrier,
-                                                  ec: ExecutionContext): Future[Unit] =
+                                                  ec: ExecutionContext): Future[RdsAcknowledgementResponse] =
     wsClient
       .url(baseUrlToAcknowledgeRdsAssessments)
       .post(Json.toJson(request))
       .map(response =>
         response.status match {
-          case Status.OK => {logger.info(s"... submitting acknowledgement to RDS success")}
+          case Status.OK => {logger.info(s"... submitting acknowledgement to RDS success")
           //no need to validate as we are interested only in OK response.if validation is required then
           // we need separate class, as the structure is different
-          //  response.json.validate[NewRdsAssessmentReport].getOrElse(throw new RuntimeException("failed to validate "))}
+            response.json.validate[RdsAcknowledgementResponse].getOrElse(throw new RuntimeException("failed to validate "))}
           case unexpectedStatus => {
             logger.error(s"... error during rds acknowledgement ")
             throw new RuntimeException(s"Unexpected status when attempting to mark the report as acknowledged with RDS: [$unexpectedStatus]")}

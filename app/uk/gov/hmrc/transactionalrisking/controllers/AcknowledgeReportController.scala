@@ -26,7 +26,7 @@ import uk.gov.hmrc.transactionalrisking.services.nrs.models.request.AcknowledgeR
 import uk.gov.hmrc.transactionalrisking.services.{EnrolmentsAuthService, TransactionalRiskingService}
 import uk.gov.hmrc.transactionalrisking.utils.Logging
 import uk.gov.hmrc.transactionalrisking.models.errors.ErrorWrapper
-import uk.gov.hmrc.transactionalrisking.services.rds.models.response.NewRdsAssessmentReport
+import uk.gov.hmrc.transactionalrisking.services.rds.models.response.{NewRdsAssessmentReport, RdsAcknowledgementResponse}
 
 import java.util.UUID
 import javax.inject.Inject
@@ -61,7 +61,7 @@ class AcknowledgeReportController @Inject()(
 
 
         val parsedRequest: Either[ErrorWrapper, AcknowledgeReportRequest] = requestParser.parseRequest(AcknowledgeReportRawData(nino, reportId))
-        val response: Either[ErrorWrapper, Future[NewRdsAssessmentReport]] = parsedRequest.map(req => transactionalRiskingService.acknowledge(req,Internal))
+        val response: Either[ErrorWrapper, Future[RdsAcknowledgementResponse]] = parsedRequest.map(req => transactionalRiskingService.acknowledge(req,Internal))
         response match {
           case Right(value) => {
             value.map(r=> logger.info(s"RDS success response $r"))
