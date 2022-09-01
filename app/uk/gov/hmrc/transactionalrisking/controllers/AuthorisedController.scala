@@ -25,7 +25,7 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.transactionalrisking.models.errors.ForbiddenDownstreamError
 import uk.gov.hmrc.transactionalrisking.models.auth.UserDetails
 import uk.gov.hmrc.transactionalrisking.models.domain.NinoChecker
-import uk.gov.hmrc.transactionalrisking.models.errors.{DownstreamError, ForbiddenDownstreamError, LegacyUnauthorisedError, NinoFormatError}
+import uk.gov.hmrc.transactionalrisking.models.errors.{DownstreamError, ForbiddenDownstreamError, ClientOrAgentNotAuthorisedError, NinoFormatError}
 import uk.gov.hmrc.transactionalrisking.services.EnrolmentsAuthService
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -55,10 +55,14 @@ abstract class AuthorisedController(cc: ControllerComponents)(implicit ec: Execu
       //TODO check if we need to perform NINO validation here Nino.isValid(nino)
       if (NinoChecker.isValid(nino)) {
         authService.authorised(predicate(nino), nrsRequired).flatMap[Result] {
-          case Right(userDetails) => block(UserRequest(userDetails.copy(clientId = clientId), request))
-          case Left(LegacyUnauthorisedError) => Future.successful(Forbidden(Json.toJson(LegacyUnauthorisedError)))
-          case Left(ForbiddenDownstreamError) => Future.successful(Forbidden(Json.toJson(DownstreamError)))
-          case Left(_) => Future.successful(InternalServerError(Json.toJson(DownstreamError)))
+          case Right(userDetails) =>
+            block(UserRequest(userDetails.copy(clientId = clientId), request))
+          case Left(ClientOrAgentNotAuthorisedError) =>
+            Future.successful(Forbidden(Json.toJson(ClientOrAgentNotAuthorisedError)))
+          case Left(ForbiddenDownstreamError) =>
+            Future.successful(Forbidden(Json.toJson(DownstreamError)))
+          case Left(_) =>
+            Future.successful(InternalServerError(Json.toJson(DownstreamError)))
         }
       } else {
         Future.successful(BadRequest(Json.toJson(NinoFormatError)))

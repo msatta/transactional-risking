@@ -68,7 +68,7 @@ object NrsError extends MtdError("NRS_SUBMISSION_FAILURE", "The submission to NR
 object ReportIdFormatError extends MtdError("REPORT_ID_INVALID", "The provided REPORT_ID format is invalid")
 
 // Format Errors
-object NinoFormatError extends MtdError("NINO_INVALID", "The provided NINO format is invalid")
+object NinoFormatError extends MtdError("FORMAT_NINO", "The provided NINO is invalid")
 object NinoFormatErrorDes extends MtdError("NINO_INVALID", "The provided NINO is invalid")
 object NinoNotFound extends MtdError("NINO_NOT_FOUND", "The provided NINO was not found")
 object CalculationIdFormatError
@@ -97,6 +97,7 @@ object InvalidBearerTokenError extends MtdError("UNAUTHORIZED", "Bearer token is
 
 // Legacy Authorisation Errors
 object LegacyUnauthorisedError extends MtdError("CLIENT_OR_AGENT_NOT_AUTHORISED", "The client and/or agent is not authorised.")
+object ClientOrAgentNotAuthorisedError extends MtdError("CLIENT_OR_AGENT_NOT_AUTHORISED", "The client and/or agent is not authorised.")
 
 object ForbiddenDownstreamError extends MtdError(
   code = "INTERNAL_SERVER_ERROR",

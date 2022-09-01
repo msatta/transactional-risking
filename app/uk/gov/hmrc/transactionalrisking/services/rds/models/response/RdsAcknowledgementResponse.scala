@@ -18,7 +18,7 @@ package uk.gov.hmrc.transactionalrisking.services.rds.models.response
 
 import play.api.libs.functional.syntax.{toFunctionalBuilderOps, unlift}
 import play.api.libs.json.Format.GenericFormat
-import play.api.libs.json.{JsNumber, JsObject, JsPath, JsResult, JsString, JsSuccess, JsValue, Reads, Writes}
+import play.api.libs.json._
 import uk.gov.hmrc.transactionalrisking.services.rds.models.response.RdsAcknowledgementResponse.AcknowledgementOutput
 
 
@@ -85,8 +85,6 @@ object RdsAcknowledgementResponse {
   case class AcknowledgementMainOutputWrapper(name: String, value: DataValue) extends AcknowledgementOutput
 
   object AcknowledgementMainOutputWrapper {
-    import DataValueString._
-    import DataValueInt._
 //    val reads: Reads[AcknowledgementMainOutputWrapper] =
 //      (JsPath \ "name").read[String]
 //        .and((JsPath \ "value").read[String])(AcknowledgementMainOutputWrapper.apply _)
