@@ -133,54 +133,6 @@ logger.info(s"rds ack response is ${rdsReport.toString}")
         }
       )
 
-/*  def find(id: UUID): Future[Option[AssessmentReport]] =
-    wsClient
-//      .url(s"$baseUrlForRdsAssessments/$id")
-      .url(s"$baseUrlForRdsAssessmentsSubmit/$id")
-      .get().map(response =>
-      response.status match {
-        case Status.OK => Some(response.json.validate[NewRdsAssessmentReport].get)
-        case Status.NOT_FOUND => None
-        case unexpectedStatus => throw new RuntimeException(s"Unexpected status when attempting to get the assessment report from RDS: [$unexpectedStatus]")
-      }
-    ).map(opt => opt.map(toAssessmentReport))*/
-
-/*  private def accessFraudRiskReport(request: FraudRiskRequest)(implicit ec: ExecutionContext): Future[FraudRiskReport] =
-    wsClient
-      .url(baseUrlForCip)
-      .post(Json.toJson(request))
-      .map(response =>
-        response.status match {
-          //          case Status.OK => response.json.validate[FraudRiskReport].get
-          case Status.OK => response.json.as[FraudRiskReport]
-          case unexpectedStatus => throw new RuntimeException(s"Unexpected status when attempting to get the assessment report from RDS: [$unexpectedStatus]")
-        }
-      )*/
-
-
-
-//  private def baseUrlForRdsAssessments = s"http://localhost:$port/rds/assessments/sa"
-//  private def baseUrlForRdsAssessments = s"${appConfig.rdsBaseUrlForSubmit}"
-
-//  private def baseUrlForCip = s"${appConfig.cipFraudServiceBaseUrl}"
-
-//  private def baseUrlForAcknowledgedRdsAssessments = s"http://localhost:$port/rds/acknowledged_assessments/sa"
-
-
-//  private def acknowledge(request: RdsAcknowledgementRequestForSelfAssessment): Future[Unit] =
-//    wsClient
-//      .url(baseUrlForAcknowledgedRdsAssessments)
-//      .post(Json.toJson(request))
-//      .map(response =>
-//        response.status match {
-//          case Status.NO_CONTENT =>
-//          case unexpectedStatus => throw new RuntimeException(s"Unexpected status when attempting to mark the report as acknowledged with RDS: [$unexpectedStatus]")
-//        }
-//      )
-
-//  private def port: String = System.getProperty("http.port", "9000")
-
-
   private def toAssessmentReport(report: NewRdsAssessmentReport,request:AssessmentRequestForSelfAssessment) = {
    //TODO check should this be calculationId or feedbackId?
     AssessmentReport(reportId=report.calculationId,
@@ -252,29 +204,6 @@ logger.info(s"rds ack response is ${rdsReport.toString}")
     )
   }
 
-//  private def doExplicitAuditingForGenerationRequest(): Unit = {
-//    auditService.auditExplicit(generateExplicitAuditingRequest("Request received to generate an assessment report"))
-//  }
-//
-//  private def doImplicitAuditing(): Unit = {
-//    auditService.auditImplicit(generateImplicitAuditingRequest())
-//  }
-//
-//
-//  private def auditRequestToAcknowledge(request: AcknowledgementRequestForSelfAssessment): Unit = {
-//    auditService.auditExplicit(generateExplicitAuditingRequest(s"Request received to acknowledge an assessment report for Self Assessment [${request.assessmentId}]"))
-//  }
-//
-//  private def auditRecordedAcknowledgement(request: AcknowledgementRequestForSelfAssessment, submissionId: UUID): Unit = {
-//    auditService.auditExplicit(generateExplicitAuditingRequest(s"Assessment report [${request.assessmentId}] for Self Assessment, has been recorded as acknowledged, with submission ID: [$submissionId]"))
-//  }
-//
-//  private def generateExplicitAuditingRequest(description: String): ExplicitAuditingRequest
-//  = ExplicitAuditingRequest(ExplicitAuditingEvent(description))
-
-
-//  private def generateImplicitAuditingRequest(): ImplicitAuditingRequest
-//  = ImplicitAuditingRequest(ImplicitAuditingEvent())
 
 
 }

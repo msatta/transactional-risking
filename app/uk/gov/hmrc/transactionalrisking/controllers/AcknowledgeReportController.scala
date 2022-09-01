@@ -70,60 +70,10 @@ class AcknowledgeReportController @Inject()(
           }
           case Left(value) => Future(BadRequest(Json.toJson(value)))
         }
-//        serviceResponse <- {
-//
-//          //Submit Return to ETMP
-//          EitherT(service.submitReturn(parsedRequest.copy(body =
-//            parsedRequest.body.copy(receivedAt =
-//              Some(submissionTimestamp.format(DateUtils.dateTimePattern)), agentReference = arn))))
-//          //Submit asynchronously to NRS
-//          nrsService.submit(parsedRequest, nrsId, submissionTimestamp)
-
-
-
-//      toId(rawId)
-//        .map(id => transactionalRiskingService.acknowledge(AcknowledgementRequestForSelfAssessment(id), origin).map(_ => NoContent))
-//        .getOrElse(Future(BadRequest(asError("Please provide the ID of an Assessment Report."))))
-      //Future(BadRequest(asError("Development in progress.")))
     }
     }
 
   private def asError(message: String): JsObject = Json.obj("message" -> message)
-  //
-  //  def externalGenerateReportForSelfAssessment(nino: String, calculationId: UUID): Action[Unit] = generateReportForSelfAssessment(External, nino, calculationId)
-  //
-  //  private def generateReportForSelfAssessment(origin: Origin, nino: String, calculationId: UUID): Action[Unit] = Action.async(parse.empty) { request: Request[Unit] => {
-  //    logger.info(s"Received request to generate a report from [$origin] for NINO [$nino] and Calculation ID [$calculationId]")
-  //    transactionalRiskingService.assess(assessmentRequestForSelfAssessment(request, origin, nino, calculationId), origin).map(Json.toJson[AssessmentReport]).map(js => Ok(js))
-  //  }
-  //  }
-
-  //  private def assessmentRequestForSelfAssessment(request: Request[_], origin: Origin, nino: String, calculationId: UUID): AssessmentRequestForSelfAssessment = {
-  //    val authorisationInfo = getAuthorisationInfo(request)
-  //    val calculationInfo: CalculationInfo = getCalculationInfo(calculationId, nino)
-  //    val preferredLanguage = if (origin == External) English else getPreferredLanguage(request)
-  //    AssessmentRequestForSelfAssessment(
-  //      calculationId = calculationId,
-  //      nino = nino,
-  //      preferredLanguage = preferredLanguage,
-  //      customerType = authorisationInfo.customerType,
-  //      agentRef = authorisationInfo.agentRef,
-  //      taxYear = calculationInfo.taxYear
-  //    )
-  //
-  //  }
-
-
-  //  private def getAuthorisationInfo(request: Request[_]): AuthorisationInfo =
-  //    authService.getAuthorisationInfo(request)
-
-  //  private def getPreferredLanguage(request: Request[_]): PreferredLanguage = English
-
-  //  def externalAcknowledgeAssessmentForSelfAssessment(rawId: String): Action[AnyContent] = acknowledgeAssessmentForSelfAssessment(rawId, External)
-
-  //  private def asError(errors: Seq[(JsPath, Seq[JsonValidationError])]): JsObject = asError(JsError.toJson(errors))
-
-  //  private def asError(json: JsObject): JsObject = Json.obj("message" -> json)
 
 
 }
