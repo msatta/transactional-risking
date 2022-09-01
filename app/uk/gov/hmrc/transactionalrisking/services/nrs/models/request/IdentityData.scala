@@ -25,10 +25,10 @@ import java.time.LocalDate
 
 case class IdentityData(internalId: Option[String] = None,
                         externalId: Option[String] = None,
-                        agentCode: Option[String] = None,
-                        credentials: Option[Credentials] = None,
+                        agentCode: Option[String] = None,//TODO this is not required as its alreay there in AgentInformation
+                        credentials: Option[Credentials] = None,//TODO not present in documentation
                         confidenceLevel: ConfidenceLevel,
-                        nino: Option[String] = None,
+                        nino: Option[String] = None,//TODO below 3 rows may be need to move under search keys
                         saUtr: Option[String] = None,
                         name: Option[Name] = None,
                         dateOfBirth: Option[LocalDate] = None,
@@ -42,7 +42,13 @@ case class IdentityData(internalId: Option[String] = None,
                         itmpAddress: ItmpAddress,
                         affinityGroup: Option[AffinityGroup],
                         credentialStrength: Option[String] = None,
-                        loginTimes: LoginTimes)
+                        loginTimes: LoginTimes,
+                       //TODO below data is missing, in our response, need to add
+                       // userAuthToken: String,
+                       // headerData:HeaderData
+                       //searchKeys
+
+                       )
 
 object IdentityData {
   implicit val localDateReads: Reads[LocalDate] = DateUtils.dateReads

@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.transactionalrisking.services.nrs.models.request
+package uk.gov.hmrc.transactionalrisking.models.audit
 
-case class SubmitRequest(nino: String, body: SubmitRequestBody)
+import play.api.libs.json.{Json, OFormat}
+
+case class AuditError(errorCode: String)
+
+object AuditError {
+  implicit val format: OFormat[AuditError] = Json.format[AuditError]
+}
