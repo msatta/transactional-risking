@@ -55,7 +55,7 @@ class NrsConnector @Inject()(val httpClient: HttpClient,
       logger.info(s"Attempt $attemptNumber NRS submission: sending POST request to $url")
 
       httpClient
-        .POST[NrsSubmission, HttpResponse](s"$url/$reportId.", nrsSubmission, Seq("X-API-Key" -> apiKey))
+        .POST[NrsSubmission, HttpResponse](s"$url", nrsSubmission, Seq("X-API-Key" -> apiKey))
         .map { response =>
           val status = response.status
 

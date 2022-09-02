@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.transactionalrisking.controllers
 
+import play.api.http.Status
 import play.api.libs.json._
 import play.api.mvc._
 import uk.gov.hmrc.transactionalrisking.controllers.requestParsers.AcknowledgeRequestParser
@@ -61,7 +62,7 @@ class AcknowledgeReportController @Inject()(
 
 
         val parsedRequest: Either[ErrorWrapper, AcknowledgeReportRequest] = requestParser.parseRequest(AcknowledgeReportRawData(nino, reportId))
-        val response: Either[ErrorWrapper, Future[RdsAcknowledgementResponse]] = parsedRequest.map(req => transactionalRiskingService.acknowledge(req,Internal))
+        val response: Either[ErrorWrapper, Future[Int]] = parsedRequest.map(req => transactionalRiskingService.acknowledge(req,Internal))
         response match {
           case Right(value) => {
             value.map(r=> logger.info(s"RDS success response $r"))
